@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>COSMOS IDLE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap');
+:root {
+  --navy:#0A0E1A; --navy2:#111827; --navy3:#1a2235; --navy4:#0d1220;
+  --gold:#FFB800; --gold2:#FFC93C; --gold-dim:rgba(255,184,0,0.15);
+  --purple:#7B2FBE; --purple2:#9B4FDE; --cyan:#00D4FF; --cyan-dim:rgba(0,212,255,0.12);
+  --orange:#FF4500; --green:#4ADE80; --red:#FF4466;
+  --text:#C8D6F0; --text-dim:#5A6A8A;
+  --void:#1a0a2e;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--navy);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;position:relative;}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+#nebula{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 40% at 20% 30%,rgba(123,47,190,0.08) 0%,transparent 70%),
+  radial-gradient(ellipse 50% 60% at 80% 70%,rgba(0,212,255,0.06) 0%,transparent 70%),
+  radial-gradient(ellipse 40% 30% at 60% 10%,rgba(255,184,0,0.04) 0%,transparent 70%);
+  transition:all 2s ease;}
+#app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 0 85px 0;}
+
+/* PRESTIGE CINEMATIC */
+#prestige-cinematic{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;flex-direction:column;
+  background:radial-gradient(ellipse at center,rgba(123,47,190,0.9) 0%,rgba(10,14,26,0.98) 70%);}
+.cine-galaxy{font-size:80px;animation:galaxySpin 2s ease-in-out;}
+@keyframes galaxySpin{0%{transform:scale(0) rotate(0deg);opacity:0;}50%{transform:scale(1.2) rotate(180deg);opacity:1;}100%{transform:scale(1) rotate(360deg);opacity:1;}}
+.cine-text{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;color:var(--gold);letter-spacing:4px;
+  text-shadow:0 0 40px rgba(255,184,0,0.8);margin-top:20px;animation:fadeIn 0.5s 0.8s both;}
+.cine-sub{font-size:14px;color:var(--purple2);letter-spacing:2px;margin-top:8px;animation:fadeIn 0.5s 1.2s both;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* EVENT BANNER */
+#event-banner{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:500;
+  max-width:480px;width:100%;pointer-events:none;}
+.event-popup{background:linear-gradient(135deg,rgba(255,69,0,0.95),rgba(255,184,0,0.9));
+  border-bottom:2px solid var(--gold);padding:10px 16px;display:flex;align-items:center;gap:10px;
+  transform:translateY(-100%);transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events:all;}
+.event-popup.show{transform:translateY(0);}
+.event-icon{font-size:22px;}
+.event-text{flex:1;}
+.event-title{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;color:#fff;letter-spacing:1px;}
+.event-desc{font-size:11px;color:rgba(255,255,255,0.8);}
+.event-timer{font-family:'Share Tech Mono',monospace;font-size:16px;color:#fff;font-weight:700;}
+
+/* HEADER */
+header{background:linear-gradient(180deg,rgba(10,14,26,0.98),rgba(10,14,26,0.92));
+  border-bottom:1px solid rgba(255,184,0,0.25);padding:10px 14px 8px;
+  position:sticky;top:0;z-index:200;backdrop-filter:blur(20px);}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.game-title{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;letter-spacing:3px;
+  color:var(--gold);text-shadow:0 0 20px rgba(255,184,0,0.5);}
+.empire-rank{font-size:9px;color:var(--text-dim);letter-spacing:1.5px;margin-top:2px;}
+.header-badges{display:flex;gap:6px;}
+.badge{border-radius:16px;padding:3px 9px;font-family:'Orbitron',sans-serif;font-size:9px;
+  display:flex;align-items:center;gap:4px;cursor:pointer;letter-spacing:0.5px;}
+.badge-pp{background:linear-gradient(135deg,var(--purple),var(--purple2));border:1px solid rgba(155,79,222,0.6);
+  box-shadow:0 0 12px rgba(123,47,190,0.4);}
+.badge-streak{background:linear-gradient(135deg,rgba(255,69,0,0.3),rgba(255,184,0,0.2));border:1px solid rgba(255,184,0,0.4);}
+.resource-bar{display:flex;gap:6px;}
+.resource-item{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
+  border-radius:8px;padding:5px 9px;}
+.res-label{font-size:8px;letter-spacing:1.5px;color:var(--text-dim);text-transform:uppercase;margin-bottom:1px;}
+.res-value{font-family:'Share Tech Mono',monospace;font-size:15px;color:var(--gold);
+  text-shadow:0 0 8px rgba(255,184,0,0.35);line-height:1;transition:color 0.2s;}
+.res-rate{font-size:9px;color:var(--green);margin-top:1px;}
+
+/* NEXT GOAL */
+#next-goal{margin:8px 14px 0;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);
+  border-radius:8px;padding:6px 10px;display:flex;align-items:center;gap:8px;}
+.goal-label{font-size:9px;color:var(--cyan);letter-spacing:1px;flex-shrink:0;}
+.goal-text{font-size:11px;color:var(--text);flex:1;}
+.goal-bar-bg{height:3px;background:rgba(255,255,255,0.08);border-radius:3px;margin-top:3px;}
+.goal-bar-fill{height:3px;background:linear-gradient(90deg,var(--cyan),var(--gold));border-radius:3px;transition:width 0.5s;}
+
+/* SECTION */
+.section-header{display:flex;align-items:center;gap:10px;padding:12px 14px 7px;}
+.section-title{font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--cyan);}
+.section-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(0,212,255,0.35),transparent);}
+
+/* BUILDINGS */
+.buildings-grid{padding:0 14px;display:flex;flex-direction:column;gap:9px;}
+.building-card{background:linear-gradient(135deg,var(--navy2),var(--navy3));border:1px solid rgba(255,255,255,0.07);
+  border-radius:14px;padding:12px;position:relative;overflow:hidden;
+  transition:transform 0.15s,border-color 0.2s,box-shadow 0.2s;}
+.building-card.affordable{border-color:rgba(255,184,0,0.35);box-shadow:0 3px 20px rgba(255,184,0,0.08);}
+.building-card.locked{opacity:0.5;filter:grayscale(0.5);}
+.building-pulse{animation:buildingPulse 2s ease-in-out;}
+@keyframes buildingPulse{0%,100%{box-shadow:0 0 0 rgba(255,184,0,0);}50%{box-shadow:0 0 20px rgba(255,184,0,0.3);}}
+.card-accent{position:absolute;top:0;left:0;width:3px;height:100%;border-radius:14px 0 0 14px;}
+.card-top{display:flex;align-items:flex-start;gap:10px;}
+.building-icon{width:46px;height:46px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;position:relative;}
+.card-info{flex:1;min-width:0;}
+.building-name{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:#fff;margin-bottom:2px;}
+.building-desc{font-size:10px;color:var(--text-dim);line-height:1.3;margin-bottom:5px;}
+.building-stats{display:flex;gap:6px;flex-wrap:wrap;}
+.stat-chip{background:rgba(255,255,255,0.05);border-radius:5px;padding:2px 7px;
+  font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text);}
+.building-count{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:900;
+  color:var(--gold);text-shadow:0 0 15px rgba(255,184,0,0.4);flex-shrink:0;text-align:right;line-height:1;}
+.owned-label{font-size:8px;letter-spacing:1px;display:block;color:var(--text-dim);font-weight:400;margin-top:2px;}
+
+/* MILESTONES */
+.milestones{display:flex;gap:4px;margin-top:6px;}
+.milestone{flex:1;padding:3px;background:rgba(255,255,255,0.04);border-radius:5px;text-align:center;
+  font-size:8px;color:var(--text-dim);border:1px solid rgba(255,255,255,0.06);position:relative;}
+.milestone.reached{background:rgba(255,184,0,0.12);border-color:rgba(255,184,0,0.4);color:var(--gold);}
+.milestone.reached::after{content:'✓';position:absolute;top:-6px;right:-3px;font-size:9px;color:var(--green);}
+
+/* LEVEL BAR */
+.level-row{display:flex;align-items:center;justify-content:space-between;margin:6px 0 4px;}
+.level-label{font-size:9px;color:var(--text-dim);letter-spacing:1px;}
+.level-num{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--cyan);}
+.level-bar-bg{height:3px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;}
+.level-bar-fill{height:100%;border-radius:3px;transition:width 0.4s ease;}
+
+/* BUY ROW */
+.buy-row{display:flex;gap:6px;margin-top:8px;}
+.buy-btn{flex:1;background:linear-gradient(135deg,rgba(255,184,0,0.12),rgba(255,184,0,0.06));
+  border:1px solid rgba(255,184,0,0.35);border-radius:9px;padding:8px 10px;
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all 0.15s;
+  font-family:'Rajdhani',sans-serif;color:var(--gold);}
+.buy-btn:hover:not(:disabled){background:linear-gradient(135deg,rgba(255,184,0,0.22),rgba(255,184,0,0.12));
+  box-shadow:0 0 18px rgba(255,184,0,0.2);transform:translateY(-1px);}
+.buy-btn:disabled{opacity:0.35;cursor:not-allowed;border-color:rgba(255,255,255,0.08);color:var(--text-dim);
+  background:rgba(255,255,255,0.02);}
+.buy-btn .btn-label{font-size:11px;font-weight:700;letter-spacing:1px;}
+.buy-btn .btn-cost{font-family:'Share Tech Mono',monospace;font-size:11px;}
+.tap-btn{width:40px;height:40px;background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(0,212,255,0.06));
+  border:1px solid rgba(0,212,255,0.3);border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;transition:all 0.1s;flex-shrink:0;}
+.tap-btn:active{transform:scale(0.9);box-shadow:0 0 20px rgba(0,212,255,0.4);}
+
+/* SYNERGY BADGE */
+.synergy-badge{display:inline-block;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);
+  border-radius:5px;padding:2px 7px;font-size:9px;color:var(--green);margin-top:5px;}
+
+/* SPECIAL BUILDING */
+.special-building-overlay{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
+  z-index:400;max-width:460px;width:calc(100% - 28px);}
+.special-building{background:linear-gradient(135deg,rgba(255,69,0,0.95),rgba(123,47,190,0.9));
+  border:2px solid var(--gold);border-radius:16px;padding:14px 16px;
+  display:flex;align-items:center;gap:12px;cursor:pointer;
+  animation:specialBlink 0.5s ease-in-out infinite alternate;box-shadow:0 0 40px rgba(255,69,0,0.5);}
+@keyframes specialBlink{to{box-shadow:0 0 60px rgba(255,184,0,0.7);border-color:rgba(255,255,255,0.9);}}
+.special-icon{font-size:32px;}
+.special-info{flex:1;}
+.special-name{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:900;color:#fff;letter-spacing:1px;}
+.special-reward{font-size:11px;color:rgba(255,255,255,0.8);margin-top:2px;}
+.special-countdown{font-family:'Share Tech Mono',monospace;font-size:18px;color:var(--gold);font-weight:700;}
+
+/* PRESTIGE TAB */
+.prestige-panel{margin:0 14px 14px;background:linear-gradient(135deg,rgba(123,47,190,0.1),rgba(123,47,190,0.05));
+  border:1px solid rgba(123,47,190,0.35);border-radius:14px;padding:14px;position:relative;overflow:hidden;}
+.prestige-panel::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:conic-gradient(from 0deg,transparent 0deg,rgba(123,47,190,0.04) 60deg,transparent 120deg);
+  animation:rotateGlow 10s linear infinite;}
+@keyframes rotateGlow{to{transform:rotate(360deg);}}
+.prestige-content{position:relative;z-index:1;}
+.prestige-title{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;letter-spacing:2px;
+  color:var(--purple2);text-shadow:0 0 20px rgba(155,79,222,0.5);margin-bottom:3px;}
+.prestige-desc{font-size:11px;color:var(--text-dim);margin-bottom:10px;line-height:1.4;}
+.pp-tiers{display:flex;gap:6px;margin-bottom:12px;}
+.pp-tier{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  border-radius:9px;padding:8px;text-align:center;}
+.pp-tier.active{border-color:rgba(123,47,190,0.5);background:rgba(123,47,190,0.1);}
+.pp-tier-label{font-size:8px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;}
+.pp-tier-val{font-family:'Orbitron',sans-serif;font-size:14px;color:var(--gold);font-weight:700;}
+.prestige-reward{display:flex;align-items:center;gap:8px;background:rgba(123,47,190,0.12);
+  border-radius:9px;padding:9px 12px;margin-bottom:10px;border:1px solid rgba(123,47,190,0.22);}
+.pp-gain{font-family:'Orbitron',sans-serif;font-size:16px;color:var(--gold);}
+.pp-sub{font-size:9px;color:var(--text-dim);}
+.prestige-challenges{margin-bottom:10px;}
+.challenge-item{background:rgba(255,69,0,0.08);border:1px solid rgba(255,69,0,0.25);border-radius:9px;
+  padding:8px 10px;margin-bottom:6px;cursor:pointer;transition:all 0.15s;}
+.challenge-item.active-challenge{border-color:rgba(255,69,0,0.6);box-shadow:0 0 15px rgba(255,69,0,0.15);}
+.challenge-item.completed{border-color:rgba(74,222,128,0.4);background:rgba(74,222,128,0.06);}
+.challenge-title{font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;color:#FF6B35;}
+.challenge-desc{font-size:10px;color:var(--text-dim);margin-top:2px;}
+.challenge-reward{font-size:9px;color:var(--gold);margin-top:3px;}
+.prestige-btn{width:100%;padding:11px;background:linear-gradient(135deg,var(--purple),var(--purple2));
+  border:none;border-radius:11px;font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:2px;color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(123,47,190,0.45);
+  transition:all 0.2s;position:relative;overflow:hidden;}
+.prestige-btn::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);
+  transform:translateX(-100%);transition:transform 0.5s;}
+.prestige-btn:hover::after{transform:translateX(100%);}
+.prestige-btn:hover:not(:disabled){box-shadow:0 6px 30px rgba(123,47,190,0.65);transform:translateY(-1px);}
+.prestige-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+
+/* UPGRADES */
+.upgrades-grid{padding:0 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.upgrade-card{background:var(--navy2);border:1px solid rgba(255,255,255,0.07);border-radius:11px;
+  padding:11px;cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden;}
+.upgrade-card.purchased{border-color:rgba(74,222,128,0.35);background:rgba(74,222,128,0.05);}
+.upgrade-card.purchasable{border-color:rgba(123,47,190,0.5);box-shadow:0 0 15px rgba(123,47,190,0.12);}
+.upgrade-card:hover:not(.purchased){transform:translateY(-1px);box-shadow:0 4px 20px rgba(123,47,190,0.2);}
+.upgrade-icon{font-size:20px;margin-bottom:5px;}
+.upgrade-name{font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.5px;
+  color:#fff;margin-bottom:3px;line-height:1.2;}
+.upgrade-desc{font-size:10px;color:var(--text-dim);margin-bottom:6px;line-height:1.3;}
+.upgrade-cost{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--purple2);}
+.upgrade-cost.purchased{color:var(--green);}
+.upgrade-tier{position:absolute;top:6px;right:6px;font-size:7px;letter-spacing:1px;
+  padding:1px 4px;border-radius:3px;font-weight:700;}
+.tier-1{background:rgba(255,184,0,0.2);color:var(--gold);}
+.tier-2{background:rgba(123,47,190,0.3);color:var(--purple2);}
+.tier-3{background:rgba(255,69,0,0.3);color:var(--orange);}
+
+/* GALAXY MAP */
+.galaxy-map{padding:0 14px;}
+.galaxy-zones{display:flex;flex-direction:column;gap:8px;}
+.zone-card{border-radius:14px;padding:12px;border:1px solid;position:relative;overflow:hidden;cursor:pointer;transition:all 0.2s;}
+.zone-card.unlocked{border-color:rgba(0,212,255,0.3);background:linear-gradient(135deg,rgba(0,212,255,0.06),rgba(0,212,255,0.02));}
+.zone-card.locked{border-color:rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);opacity:0.6;}
+.zone-card.active-zone{border-color:rgba(255,184,0,0.5);background:linear-gradient(135deg,rgba(255,184,0,0.08),rgba(255,184,0,0.02));
+  box-shadow:0 0 20px rgba(255,184,0,0.12);}
+.zone-header{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.zone-icon{font-size:28px;}
+.zone-name{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:#fff;}
+.zone-sub{font-size:10px;color:var(--text-dim);margin-top:1px;}
+.zone-bonus{font-size:10px;color:var(--green);margin-top:4px;}
+.zone-req{font-size:9px;color:var(--text-dim);font-style:italic;}
+.zone-active-badge{position:absolute;top:8px;right:8px;background:var(--gold);color:var(--navy);
+  font-size:7px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:4px;font-family:'Orbitron',sans-serif;}
+
+/* RESEARCH */
+.research-grid{padding:0 14px;display:flex;flex-direction:column;gap:8px;}
+.research-node{background:var(--navy2);border:1px solid rgba(255,255,255,0.07);border-radius:11px;
+  padding:11px 13px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all 0.15s;}
+.research-node.researched{border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.04);}
+.research-node.available{border-color:rgba(0,212,255,0.35);box-shadow:0 0 12px rgba(0,212,255,0.08);}
+.research-node:hover:not(.researched){transform:translateX(2px);}
+.rn-icon{font-size:20px;flex-shrink:0;}
+.rn-info{flex:1;}
+.rn-name{font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.5px;color:#fff;}
+.rn-desc{font-size:10px;color:var(--text-dim);margin-top:1px;}
+.rn-cost{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--cyan);margin-top:3px;}
+.rn-status{font-size:11px;flex-shrink:0;}
+
+/* ACHIEVEMENTS */
+.achievements-grid{padding:0 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.ach-card{background:var(--navy2);border:1px solid rgba(255,255,255,0.06);border-radius:11px;
+  padding:10px;text-align:center;transition:all 0.2s;}
+.ach-card.unlocked{border-color:rgba(255,184,0,0.4);background:rgba(255,184,0,0.06);}
+.ach-card.secret:not(.unlocked){filter:grayscale(1);opacity:0.4;}
+.ach-icon{font-size:22px;margin-bottom:4px;}
+.ach-name{font-size:8px;font-weight:700;letter-spacing:0.5px;color:var(--text-dim);line-height:1.2;}
+.ach-card.unlocked .ach-name{color:var(--gold);}
+.ach-progress{margin-top:5px;height:2px;background:rgba(255,255,255,0.07);border-radius:2px;}
+.ach-progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width 0.5s;}
+
+/* DAILY MISSIONS */
+.missions-list{padding:0 14px;display:flex;flex-direction:column;gap:8px;}
+.mission-item{background:var(--navy2);border:1px solid rgba(255,255,255,0.07);border-radius:11px;
+  padding:11px 13px;display:flex;align-items:center;gap:10px;}
+.mission-item.completed{border-color:rgba(74,222,128,0.3);background:rgba(74,222,128,0.04);}
+.mission-icon{font-size:20px;flex-shrink:0;}
+.mission-info{flex:1;}
+.mission-name{font-size:12px;font-weight:700;color:#fff;}
+.mission-desc{font-size:10px;color:var(--text-dim);margin-top:1px;}
+.mission-bar-bg{height:4px;background:rgba(255,255,255,0.07);border-radius:4px;margin-top:5px;}
+.mission-bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:4px;transition:width 0.5s;}
+.mission-reward{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--gold);flex-shrink:0;text-align:right;}
+.mission-check{font-size:18px;color:var(--green);flex-shrink:0;}
+.streak-display{margin:0 14px 10px;background:linear-gradient(135deg,rgba(255,69,0,0.1),rgba(255,184,0,0.06));
+  border:1px solid rgba(255,184,0,0.25);border-radius:11px;padding:11px 14px;
+  display:flex;align-items:center;gap:12px;}
+.streak-fire{font-size:26px;}
+.streak-info{flex:1;}
+.streak-days{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:900;color:var(--gold);}
+.streak-label{font-size:10px;color:var(--text-dim);margin-top:1px;}
+.streak-bonus{font-size:10px;color:var(--green);}
+
+/* VOID TAB */
+.void-locked{margin:14px;background:rgba(26,10,46,0.8);border:1px solid rgba(123,47,190,0.3);
+  border-radius:14px;padding:24px;text-align:center;}
+.void-locked-icon{font-size:48px;margin-bottom:12px;opacity:0.5;}
+.void-locked-title{font-family:'Orbitron',sans-serif;font-size:14px;color:var(--purple2);letter-spacing:2px;margin-bottom:6px;}
+.void-locked-desc{font-size:11px;color:var(--text-dim);line-height:1.5;}
+
+/* BOSS */
+#boss-overlay{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
+  z-index:400;max-width:460px;width:calc(100% - 28px);display:none;}
+.boss-card{background:linear-gradient(135deg,rgba(255,68,102,0.9),rgba(123,47,190,0.85));
+  border:2px solid var(--red);border-radius:16px;padding:14px;
+  box-shadow:0 0 40px rgba(255,68,102,0.4);}
+.boss-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.boss-icon{font-size:30px;animation:bossPulse 1s ease-in-out infinite alternate;}
+@keyframes bossPulse{to{transform:scale(1.1);filter:brightness(1.3);}}
+.boss-name{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;color:#fff;letter-spacing:1px;}
+.boss-sub{font-size:10px;color:rgba(255,255,255,0.7);}
+.boss-hp-bg{height:8px;background:rgba(0,0,0,0.4);border-radius:8px;overflow:hidden;margin-bottom:8px;}
+.boss-hp-fill{height:100%;background:linear-gradient(90deg,var(--green),#FFB800,var(--red));border-radius:8px;transition:width 0.3s;}
+.boss-fight-btn{width:100%;padding:10px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);
+  border-radius:10px;font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;
+  color:#fff;cursor:pointer;transition:all 0.15s;}
+.boss-fight-btn:hover{background:rgba(255,255,255,0.25);}
+
+/* NAV */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;background:rgba(10,14,26,0.97);
+  border-top:1px solid rgba(255,255,255,0.07);display:flex;backdrop-filter:blur(20px);z-index:300;}
+.nav-btn{flex:1;padding:9px 4px 11px;background:none;border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  color:var(--text-dim);font-family:'Rajdhani',sans-serif;transition:color 0.15s;position:relative;}
+.nav-btn.active{color:var(--gold);}
+.nav-btn .nav-icon{font-size:18px;line-height:1;}
+.nav-btn .nav-label{font-size:8px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.nav-notif{position:absolute;top:6px;right:calc(50% - 14px);width:7px;height:7px;
+  background:var(--red);border-radius:50%;border:1px solid var(--navy);}
+
+/* TOAST */
+.toast{position:fixed;top:75px;left:50%;transform:translateX(-50%) translateY(-20px);
+  background:var(--navy3);border:1px solid var(--gold);border-radius:25px;padding:7px 18px;
+  font-size:12px;font-weight:600;color:var(--gold);opacity:0;pointer-events:none;z-index:600;
+  transition:all 0.3s;white-space:nowrap;box-shadow:0 4px 18px rgba(255,184,0,0.25);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* FLOAT NUMBERS */
+.float-num{position:fixed;pointer-events:none;z-index:700;font-family:'Share Tech Mono',monospace;
+  font-size:13px;font-weight:700;color:var(--gold);text-shadow:0 0 8px rgba(255,184,0,0.7);
+  animation:floatUp 1.2s ease-out forwards;}
+@keyframes floatUp{0%{transform:translateY(0) scale(1);opacity:1;}100%{transform:translateY(-80px) scale(0.7);opacity:0;}}
+.float-num.cyan{color:var(--cyan);text-shadow:0 0 8px rgba(0,212,255,0.7);}
+.float-num.green{color:var(--green);text-shadow:0 0 8px rgba(74,222,128,0.7);}
+.float-num.purple{color:var(--purple2);text-shadow:0 0 8px rgba(155,79,222,0.7);}
+
+/* PARTICLE */
+.particle{position:fixed;border-radius:50%;pointer-events:none;z-index:0;animation:floatPart linear infinite;opacity:0;}
+@keyframes floatPart{0%{transform:translateY(100vh) scale(0);opacity:0;}10%{opacity:0.8;}90%{opacity:0.4;}100%{transform:translateY(-10vh) scale(1);opacity:0;}}
+.tab-content{display:none;} .tab-content.active{display:block;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:3px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:rgba(255,184,0,0.3);border-radius:3px;}
+
+/* SOUND TOGGLE */
+#sound-toggle{position:fixed;top:12px;right:14px;z-index:9000;display:none;
+  background:rgba(255,184,0,0.12);border:1px solid rgba(255,184,0,0.3);
+  border-radius:50%;width:32px;height:32px;align-items:center;justify-content:center;
+  cursor:pointer;font-size:14px;transition:all 0.2s;}
+#sound-toggle:hover{background:rgba(255,184,0,0.25);}
+
+/* DAILY CHEST BUTTON (in missions tab) */
+.chest-section{padding:0 14px 10px;}
+.chest-card{background:linear-gradient(135deg,rgba(255,184,0,0.12),rgba(255,100,0,0.08));
+  border:2px solid rgba(255,184,0,0.5);border-radius:16px;padding:16px;
+  text-align:center;position:relative;overflow:hidden;cursor:pointer;transition:all 0.2s;}
+.chest-card.claimed{border-color:rgba(255,255,255,0.1);opacity:0.6;cursor:default;
+  background:rgba(255,255,255,0.03);}
+.chest-card:not(.claimed):hover{box-shadow:0 0 30px rgba(255,184,0,0.3);transform:translateY(-2px);}
+.chest-card::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,184,0,0.06),transparent);
+  animation:chestShimmer 2s ease-in-out infinite;}
+.chest-card.claimed::before{display:none;}
+@keyframes chestShimmer{0%,100%{transform:translateX(-100%);}50%{transform:translateX(100%);}}
+.chest-icon{font-size:44px;margin-bottom:8px;display:block;
+  animation:chestFloat 2s ease-in-out infinite;}
+.chest-card.claimed .chest-icon{animation:none;filter:grayscale(1);}
+@keyframes chestFloat{0%,100%{transform:translateY(0) rotate(-3deg);}50%{transform:translateY(-6px) rotate(3deg);}}
+.chest-title{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;
+  letter-spacing:2px;color:var(--gold);margin-bottom:4px;}
+.chest-card.claimed .chest-title{color:var(--text-dim);}
+.chest-sub{font-size:11px;color:var(--text-dim);}
+.chest-timer{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--cyan);margin-top:6px;}
+
+/* CHEST OPEN ANIMATION */
+#chest-anim{position:fixed;inset:0;z-index:8000;display:none;
+  align-items:center;justify-content:center;flex-direction:column;
+  background:rgba(10,14,26,0.93);backdrop-filter:blur(8px);}
+.chest-open-icon{font-size:90px;animation:chestBounce 0.4s ease-out;}
+@keyframes chestBounce{0%{transform:scale(0.5);}60%{transform:scale(1.15);}100%{transform:scale(1);}}
+.chest-open-title{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;
+  color:var(--gold);letter-spacing:3px;margin-top:16px;text-shadow:0 0 30px rgba(255,184,0,0.8);}
+.chest-open-rewards{display:flex;gap:14px;margin-top:16px;flex-wrap:wrap;justify-content:center;}
+.chest-reward-item{background:rgba(255,255,255,0.07);border:1px solid rgba(255,184,0,0.3);
+  border-radius:12px;padding:12px 18px;text-align:center;
+  animation:rewardPop 0.3s ease-out both;}
+@keyframes rewardPop{from{transform:scale(0) rotate(-10deg);opacity:0;}to{transform:scale(1) rotate(0deg);opacity:1;}}
+.chest-reward-val{font-family:'Orbitron',sans-serif;font-size:18px;color:var(--gold);}
+.chest-reward-label{font-size:10px;color:var(--text-dim);margin-top:3px;letter-spacing:1px;}
+.chest-collect-btn{margin-top:20px;padding:12px 32px;
+  background:linear-gradient(135deg,var(--gold),#FF8C00);border:none;border-radius:12px;
+  font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;
+  color:var(--navy);cursor:pointer;}
+.confetti-piece{position:fixed;pointer-events:none;z-index:8001;
+  width:8px;height:8px;border-radius:2px;
+  animation:confettiFall linear forwards;}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+
+/* BLACK MARKET */
+.market-section{padding:0 14px;}
+.market-header-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.market-refresh{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan);}
+.market-deal{background:linear-gradient(135deg,rgba(255,69,0,0.1),rgba(123,47,190,0.08));
+  border:1px solid rgba(255,69,0,0.3);border-radius:13px;padding:13px;
+  margin-bottom:8px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+.market-deal:hover:not(.deal-sold){border-color:rgba(255,69,0,0.6);
+  box-shadow:0 0 20px rgba(255,69,0,0.15);transform:translateY(-1px);}
+.market-deal.deal-sold{opacity:0.4;cursor:default;}
+.deal-badge{position:absolute;top:8px;right:8px;background:var(--orange);
+  color:#fff;font-size:8px;font-weight:700;letter-spacing:1px;
+  padding:2px 7px;border-radius:4px;font-family:'Orbitron',sans-serif;}
+.deal-row{display:flex;align-items:center;gap:10px;}
+.deal-icon{font-size:26px;flex-shrink:0;}
+.deal-info{flex:1;}
+.deal-name{font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;
+  letter-spacing:1px;color:#fff;margin-bottom:3px;}
+.deal-desc{font-size:10px;color:var(--text-dim);}
+.deal-price-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+.deal-give{font-size:10px;color:var(--text-dim);}
+.deal-get{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--green);}
+.deal-cost-btn{background:rgba(255,69,0,0.2);border:1px solid rgba(255,69,0,0.5);
+  border-radius:8px;padding:5px 12px;font-family:'Share Tech Mono',monospace;
+  font-size:11px;color:var(--orange);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.deal-cost-btn:hover{background:rgba(255,69,0,0.35);}
+.market-deal.deal-sold .deal-cost-btn{background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.3);color:var(--green);cursor:default;}
+.market-timer-bar{height:3px;background:rgba(255,255,255,0.07);border-radius:3px;margin-top:8px;}
+.market-timer-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--gold));border-radius:3px;transition:width 1s linear;}
+
+/* MILESTONE CELEBRATION */
+#milestone-cel{position:fixed;inset:0;z-index:7000;display:none;
+  align-items:center;justify-content:center;pointer-events:none;}
+.milestone-popup{background:linear-gradient(135deg,rgba(255,184,0,0.15),rgba(255,100,0,0.1));
+  border:2px solid var(--gold);border-radius:20px;padding:24px 32px;text-align:center;
+  animation:milestoneIn 0.5s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;
+  box-shadow:0 0 60px rgba(255,184,0,0.4);}
+@keyframes milestoneIn{from{transform:scale(0.3) translateY(50px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+.milestone-icon-big{font-size:52px;margin-bottom:10px;}
+.milestone-cel-title{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;
+  color:var(--text-dim);text-transform:uppercase;margin-bottom:4px;}
+.milestone-cel-num{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;
+  color:var(--gold);text-shadow:0 0 30px rgba(255,184,0,0.8);}
+
+/* OFFLINE MODAL */
+#offline-modal{position:fixed;inset:0;z-index:800;display:none;align-items:center;justify-content:center;
+  background:rgba(10,14,26,0.92);backdrop-filter:blur(10px);}
+.offline-card{background:var(--navy3);border:1px solid var(--gold);border-radius:18px;padding:24px;
+  max-width:340px;width:calc(100% - 40px);text-align:center;}
+.offline-icon{font-size:48px;margin-bottom:12px;}
+.offline-title{font-family:'Orbitron',sans-serif;font-size:14px;color:var(--gold);letter-spacing:2px;margin-bottom:6px;}
+.offline-desc{font-size:12px;color:var(--text-dim);margin-bottom:16px;line-height:1.5;}
+.offline-rewards{display:flex;gap:10px;justify-content:center;margin-bottom:18px;}
+.offline-res{background:rgba(255,255,255,0.05);border-radius:9px;padding:9px 16px;text-align:center;}
+.offline-res-val{font-family:'Orbitron',sans-serif;font-size:16px;color:var(--gold);}
+.offline-res-label{font-size:9px;color:var(--text-dim);letter-spacing:1px;margin-top:2px;}
+.collect-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),#FF8C00);
+  border:none;border-radius:11px;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;
+  color:var(--navy);cursor:pointer;letter-spacing:1px;}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div id="nebula"></div>
+
+<!-- PRESTIGE CINEMATIC -->
+<div id="sound-toggle" onclick="toggleSound()">🔊</div>
+
+<!-- CHEST OPEN ANIMATION -->
+<div id="chest-anim">
+  <div class="chest-open-icon" id="chest-open-icon">📦</div>
+  <div class="chest-open-title">TAGESBELOHNUNG!</div>
+  <div class="chest-open-rewards" id="chest-open-rewards"></div>
+  <button class="chest-collect-btn" onclick="closeChestAnim()">✨ EINSAMMELN</button>
+</div>
+
+<!-- MILESTONE CELEBRATION -->
+<div id="milestone-cel">
+  <div class="milestone-popup">
+    <div class="milestone-icon-big" id="mil-icon">⚡</div>
+    <div class="milestone-cel-title" id="mil-title">MEILENSTEIN ERREICHT</div>
+    <div class="milestone-cel-num" id="mil-num">1.000.000</div>
+  </div>
+</div>
+
+
+  <div class="cine-galaxy">🌌</div>
+  <div class="cine-text" id="cine-title">PRESTIGE VOLLZOGEN</div>
+  <div class="cine-sub" id="cine-sub">+5 PRESTIGE-PUNKTE ERHALTEN</div>
+</div>
+
+<!-- EVENT BANNER -->
+<div id="event-banner">
+  <div class="event-popup" id="event-popup">
+    <div class="event-icon" id="event-icon">⚡</div>
+    <div class="event-text">
+      <div class="event-title" id="event-title">SONNENSTURM!</div>
+      <div class="event-desc" id="event-desc">2× Produktion für 30 Sekunden</div>
+    </div>
+    <div class="event-timer" id="event-timer">30</div>
+  </div>
+</div>
+
+<!-- SPECIAL BUILDING OVERLAY -->
+<div class="special-building-overlay" id="special-overlay" style="display:none">
+  <div class="special-building" id="special-building-card" onclick="claimSpecial()">
+    <div class="special-icon" id="special-icon">🛸</div>
+    <div class="special-info">
+      <div class="special-name" id="special-name">ALIEN-ARTEFAKT</div>
+      <div class="special-reward" id="special-reward">Tap zum Einsammeln!</div>
+    </div>
+    <div class="special-countdown" id="special-countdown">60</div>
+  </div>
+</div>
+
+<!-- BOSS OVERLAY -->
+<div id="boss-overlay">
+  <div class="boss-card">
+    <div class="boss-header">
+      <div class="boss-icon" id="boss-icon">👾</div>
+      <div>
+        <div class="boss-name" id="boss-name">VOID DESTROYER</div>
+        <div class="boss-sub">Weltraum-Boss erschienen!</div>
+      </div>
+    </div>
+    <div class="boss-hp-bg"><div class="boss-hp-fill" id="boss-hp" style="width:100%"></div></div>
+    <button class="boss-fight-btn" onclick="attackBoss()">⚔️ ANGREIFEN — <span id="boss-hp-text">100%</span> HP</button>
+  </div>
+</div>
+
+<!-- OFFLINE MODAL -->
+<div id="offline-modal">
+  <div class="offline-card">
+    <div class="offline-icon">🌙</div>
+    <div class="offline-title">WILLKOMMEN ZURÜCK</div>
+    <div class="offline-desc" id="offline-desc">Dein Imperium hat während deiner Abwesenheit weitergearbeitet!</div>
+    <div class="offline-rewards">
+      <div class="offline-res"><div class="offline-res-val" id="offline-energy">0</div><div class="offline-res-label">⚡ ENERGIE</div></div>
+      <div class="offline-res"><div class="offline-res-val" id="offline-crystals">0</div><div class="offline-res-label">💎 KRISTALLE</div></div>
+    </div>
+    <button class="collect-btn" onclick="collectOffline()">⚡ EINSAMMELN</button>
+  </div>
+</div>
+
+<div id="app">
+  <header>
+    <div class="header-top">
+      <div>
+        <div class="game-title">⬡ COSMOS IDLE</div>
+        <div class="empire-rank" id="empire-rank">NOVICE COMMANDER · 0 GEBÄUDE</div>
+      </div>
+      <div class="header-badges">
+        <div class="badge badge-streak" id="streak-badge">🔥 <span id="streak-val">0</span></div>
+        <div class="badge badge-pp">✦ <span id="pp-val">0</span> PP</div>
+      </div>
+    </div>
+    <div class="resource-bar">
+      <div class="resource-item">
+        <div class="res-label">⚡ Energie</div>
+        <div class="res-value" id="energy-display">0</div>
+        <div class="res-rate" id="energy-rate">+0/s</div>
+      </div>
+      <div class="resource-item">
+        <div class="res-label">💎 Kristalle</div>
+        <div class="res-value" id="crystal-display">0</div>
+        <div class="res-rate" id="crystal-rate">+0/s</div>
+      </div>
+      <div class="resource-item">
+        <div class="res-label">🌑 Dunkelm.</div>
+        <div class="res-value" id="dark-display">0</div>
+        <div class="res-rate" id="dark-rate">+0/s</div>
+      </div>
+    </div>
+    <div id="next-goal">
+      <div class="goal-label">ZIEL</div>
+      <div style="flex:1">
+        <div class="goal-text" id="goal-text">Kaufe deinen ersten Solarkollektor</div>
+        <div class="goal-bar-bg"><div class="goal-bar-fill" id="goal-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- TAB: BUILDINGS -->
+  <div class="tab-content active" id="tab-buildings">
+    <div class="section-header"><div class="section-title">🏗 GEBÄUDE</div><div class="section-line"></div></div>
+    <div class="buildings-grid" id="buildings-grid"></div>
+  </div>
+
+  <!-- TAB: PRESTIGE -->
+  <div class="tab-content" id="tab-prestige">
+    <div class="section-header"><div class="section-title">✦ PRESTIGE</div><div class="section-line"></div></div>
+    <div class="prestige-panel">
+      <div class="prestige-content">
+        <div class="prestige-title">⬡ PRESTIGE RITUAL</div>
+        <div class="prestige-desc">Setze dein Imperium zurück. Behalte Prestige-Punkte und Upgrades permanent.</div>
+        <div class="pp-tiers">
+          <div class="pp-tier active"><div class="pp-tier-label">GESAMT PP</div><div class="pp-tier-val" id="pp-total">0</div></div>
+          <div class="pp-tier"><div class="pp-tier-label">PRESTIGE #</div><div class="pp-tier-val" id="prestige-count">0</div></div>
+          <div class="pp-tier"><div class="pp-tier-label">RANG</div><div class="pp-tier-val" id="prestige-rank">I</div></div>
+        </div>
+        <div class="prestige-reward">
+          <div style="font-size:22px">✦</div>
+          <div class="pp-info">
+            <div class="pp-gain" id="pp-gain-display">0 PP</div>
+            <div class="pp-sub">Du würdest erhalten</div>
+          </div>
+        </div>
+        <div class="section-header" style="padding:0 0 8px;"><div class="section-title" style="font-size:9px">⚔️ CHALLENGES</div><div class="section-line"></div></div>
+        <div class="prestige-challenges" id="challenges-list"></div>
+        <button class="prestige-btn" id="prestige-btn" onclick="doPrestige()" disabled>⬡ PRESTIGE DURCHFÜHREN</button>
+      </div>
+    </div>
+    <div class="section-header"><div class="section-title">⚡ PRESTIGE-UPGRADES</div><div class="section-line"></div></div>
+    <div class="upgrades-grid" id="upgrades-grid"></div>
+  </div>
+
+  <!-- TAB: GALAXY MAP -->
+  <div class="tab-content" id="tab-galaxy">
+    <div class="section-header"><div class="section-title">🗺 GALAXIEN-KARTE</div><div class="section-line"></div></div>
+    <div class="galaxy-map"><div class="galaxy-zones" id="galaxy-zones"></div></div>
+  </div>
+
+  <!-- TAB: RESEARCH -->
+  <div class="tab-content" id="tab-research">
+    <div class="section-header"><div class="section-title">🔬 FORSCHUNG</div><div class="section-line"></div></div>
+    <div class="research-grid" id="research-grid"></div>
+  </div>
+
+  <!-- TAB: BLACK MARKET -->
+  <div class="tab-content" id="tab-market">
+    <div class="section-header"><div class="section-title">🏪 SCHWARZMARKT</div><div class="section-line"></div></div>
+    <div class="market-section">
+      <div class="market-header-info">
+        <div style="font-size:11px;color:var(--text-dim)">Angebote wechseln in:</div>
+        <div class="market-refresh" id="market-timer">--:--</div>
+      </div>
+      <div id="market-deals"></div>
+    </div>
+  </div>
+
+  <!-- TAB: MISSIONS & ACHIEVEMENTS -->
+  <div class="tab-content" id="tab-missions">
+    <div class="section-header"><div class="section-title">🎁 TAGESBELOHNUNG</div><div class="section-line"></div></div>
+    <div class="chest-section">
+      <div class="chest-card" id="chest-card" onclick="openDailyChest()">
+        <span class="chest-icon">🎁</span>
+        <div class="chest-title">TÄGLICHE TRUHE</div>
+        <div class="chest-sub">Öffne jeden Tag für epische Belohnungen</div>
+        <div class="chest-timer" id="chest-timer-text"></div>
+      </div>
+    </div>
+    <div class="section-header"><div class="section-title">📅 TÄGLICHE MISSIONEN</div><div class="section-line"></div>
+      <div class="streak-fire">🔥</div>
+      <div class="streak-info">
+        <div class="streak-days"><span id="streak-days">0</span> TAGE STREAK</div>
+        <div class="streak-label">Täglich einloggen für Boni</div>
+        <div class="streak-bonus" id="streak-bonus-text">+0% Produktion durch Streak</div>
+      </div>
+    </div>
+    <div class="missions-list" id="missions-list"></div>
+    <div class="section-header"><div class="section-title">🏆 ACHIEVEMENTS</div><div class="section-line"></div></div>
+    <div class="achievements-grid" id="achievements-grid"></div>
+  </div>
+
+  <!-- TAB: VOID -->
+  <div class="tab-content" id="tab-void">
+    <div class="section-header"><div class="section-title">🌑 VOID-DIMENSION</div><div class="section-line"></div></div>
+    <div id="void-content"></div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('buildings',this)" id="nav-buildings">
+    <div class="nav-icon">🏗</div><div class="nav-label">Gebäude</div>
+  </button>
+  <button class="nav-btn" onclick="switchTab('prestige',this)" id="nav-prestige">
+    <div class="nav-icon">✦</div><div class="nav-label">Prestige</div>
+  </button>
+  <button class="nav-btn" onclick="switchTab('galaxy',this)" id="nav-galaxy">
+    <div class="nav-icon">🗺</div><div class="nav-label">Galaxie</div>
+  </button>
+  <button class="nav-btn" onclick="switchTab('research',this)" id="nav-research">
+    <div class="nav-icon">🔬</div><div class="nav-label">Forschung</div>
+  </button>
+  <button class="nav-btn" onclick="switchTab('market',this)" id="nav-market">
+    <div class="nav-icon">🏪</div><div class="nav-label">Markt</div>
+    <div class="nav-notif" id="market-notif" style="display:none"></div>
+  </button>
+  <button class="nav-btn" onclick="switchTab('missions',this)" id="nav-missions">
+    <div class="nav-icon">🏆</div><div class="nav-label">Missionen</div>
+    <div class="nav-notif" id="mission-notif" style="display:none"></div>
+  </button>
+  <button class="nav-btn" onclick="switchTab('void',this)" id="nav-void">
+    <div class="nav-icon">🌑</div><div class="nav-label">Void</div>
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== GAME DATA ====================
+
+const BUILDINGS = [
+  {id:'solar',name:'SOLARKOLLEKTOR',icon:'☀️',desc:'Wandelt Sternenlicht in pure Energie.',
+   grad:'linear-gradient(180deg,#FFB800,#FF6B00)',baseCost:{energy:10},prod:{energy:0.5},
+   milestones:[{n:10,bonus:'×2 Energie'},{n:25,bonus:'×3 Energie'},{n:50,bonus:'×5 Energie'}]},
+  {id:'mine',name:'KRISTALLMINE',icon:'💎',desc:'Fördert Kristalle aus Asteroidengürteln.',
+   grad:'linear-gradient(180deg,#00D4FF,#0055FF)',baseCost:{energy:80},prod:{crystals:0.1},
+   milestones:[{n:10,bonus:'+1💎/s'},{n:25,bonus:'×2 Kristall'},{n:50,bonus:'×4 Kristall'}]},
+  {id:'reactor',name:'FUSIONSREAKTOR',icon:'⚛️',desc:'Fusioniert Materie zu Plasma-Energie.',
+   grad:'linear-gradient(180deg,#FF4500,#FF0080)',baseCost:{energy:350},prod:{energy:5},
+   milestones:[{n:10,bonus:'×2 Energie'},{n:25,bonus:'Synergie +'},{n:50,bonus:'×6 Energie'}]},
+  {id:'lab',name:'QUANTUMLABOR',icon:'🔬',desc:'Erforscht interdimensionale Synthese.',
+   grad:'linear-gradient(180deg,#7B2FBE,#00D4FF)',baseCost:{crystals:5},prod:{crystals:0.8},
+   milestones:[{n:10,bonus:'×2 Kristall'},{n:25,bonus:'+Forschung'},{n:50,bonus:'×5 Kristall'}]},
+  {id:'station',name:'RAUMSTATION',icon:'🛸',desc:'Koordiniert das galaktische Handelsnetz.',
+   grad:'linear-gradient(180deg,#4ADE80,#00D4FF)',baseCost:{energy:2000,crystals:25},prod:{energy:20,crystals:2},
+   milestones:[{n:10,bonus:'Dual Boost'},{n:25,bonus:'×3 Alles'},{n:50,bonus:'×8 Alles'}]},
+  {id:'dyson',name:'DYSON-SPHÄRE',icon:'🌟',desc:'Umhüllt Sterne und erntet ihre Energie.',
+   grad:'linear-gradient(180deg,#FFB800,#FF4500)',baseCost:{energy:15000,crystals:200},prod:{energy:150,crystals:10},
+   milestones:[{n:10,bonus:'×3 Energie'},{n:25,bonus:'Dark Matter'},{n:50,bonus:'GOD MODE'}]},
+  {id:'void_gate',name:'VOID-PORTAL',icon:'🌀',desc:'Öffnet Tore zur Dunkelmaterie-Dimension.',
+   grad:'linear-gradient(180deg,#1a0a2e,#7B2FBE)',baseCost:{energy:100000,crystals:2000},prod:{energy:1000,crystals:100,dark:1},
+   milestones:[{n:5,bonus:'Void ×2'},{n:10,bonus:'Void ×5'},{n:25,bonus:'ASCENSION'}],
+   requiresPrestige:3},
+];
+
+const PRESTIGE_UPGRADES = [
+  {id:'eu1',name:'QUANTENBOOST',icon:'⚡',desc:'+50% Energieproduktion permanent',cost:1,tier:1,effect:'eMult',val:0.5},
+  {id:'cu1',name:'KRISTALLFELD',icon:'💎',desc:'+50% Kristallproduktion',cost:1,tier:1,effect:'cMult',val:0.5},
+  {id:'cr1',name:'TEMPORALFELD',icon:'⏳',desc:'Gebäude kosten 20% weniger',cost:2,tier:1,effect:'costRed',val:0.8},
+  {id:'gm1',name:'NEURONALNETZ',icon:'🧠',desc:'+100% gesamte Produktion',cost:3,tier:2,effect:'gMult',val:1.0},
+  {id:'eu2',name:'DUNKLE MATERIE',icon:'🌑',desc:'+200% Energieproduktion',cost:5,tier:2,effect:'eMult',val:2.0},
+  {id:'cu2',name:'KRISTALLSTURM',icon:'🌪️',desc:'+200% Kristallproduktion',cost:5,tier:2,effect:'cMult',val:2.0},
+  {id:'gm2',name:'ZEITDILATATION',icon:'🌀',desc:'Produktion ×3 permanent',cost:8,tier:2,effect:'gMult',val:2.0},
+  {id:'cr2',name:'VOID-EFFIZIENZ',icon:'🔮',desc:'Kosten 40% günstiger',cost:6,tier:2,effect:'costRed',val:0.6},
+  {id:'eu3',name:'STERNENKERN',icon:'💫',desc:'+500% Energieproduktion',cost:12,tier:3,effect:'eMult',val:5.0},
+  {id:'gm3',name:'GÖTTLICHER WILLE',icon:'⚜️',desc:'Gesamtproduktion ×5',cost:20,tier:3,effect:'gMult',val:4.0},
+  {id:'dm1',name:'DUNKLE SYNTHESE',icon:'🌑',desc:'Ermöglicht Dunkelmaterie',cost:10,tier:3,effect:'darkUnlock',val:1},
+  {id:'tap1',name:'TAP-MEISTER',icon:'👆',desc:'Klick-Produktion ×5',cost:3,tier:1,effect:'tapMult',val:4.0},
+];
+
+const RESEARCH = [
+  {id:'r1',name:'QUANTENMECHANIK',icon:'⚛️',desc:'+20% Energieproduktion',cost:{crystals:50},effect:'eMult',val:0.2,req:[]},
+  {id:'r2',name:'KRISTALLOGRAPHIE',icon:'💎',desc:'+30% Kristallproduktion',cost:{crystals:120},effect:'cMult',val:0.3,req:['r1']},
+  {id:'r3',name:'FUSIONSKONTROLLE',icon:'🔥',desc:'Reaktoren produzieren ×1.5',cost:{crystals:200},effect:'buildingMult',building:'reactor',val:0.5,req:['r1']},
+  {id:'r4',name:'RAUMFALTUNG',icon:'🌌',desc:'Stationskosten -30%',cost:{crystals:350},effect:'costRed',val:0.3,req:['r2']},
+  {id:'r5',name:'TEMPORALMATRIX',icon:'⏰',desc:'+50% gesamte Produktion',cost:{crystals:600},effect:'gMult',val:0.5,req:['r2','r3']},
+  {id:'r6',name:'DUNKLE PHYSIK',icon:'🌑',desc:'Dunkelmaterie ×2',cost:{crystals:1500},effect:'dMult',val:1.0,req:['r4','r5']},
+  {id:'r7',name:'ASCENSION CODE',icon:'💻',desc:'Alle Produktion ×2',cost:{crystals:5000},effect:'gMult',val:1.0,req:['r6']},
+];
+
+const GALAXY_ZONES = [
+  {id:'sol',name:'SONNENSYSTEM',icon:'☀️',sub:'Dein Heimatsystem',bonus:'+0% (Standard)',req:null,unlocked:true},
+  {id:'alpha',name:'ALPHA CENTAURI',icon:'⭐',sub:'Nahe Sterne',bonus:'+25% Energieproduktion',req:{prestige:1},unlocked:false},
+  {id:'nebula',name:'KRABS-NEBEL',icon:'🌌',sub:'Gasriesenwolke',bonus:'+50% Kristallproduktion',req:{prestige:2},unlocked:false},
+  {id:'blackhole',name:'SCHWARZES LOCH',icon:'⚫',sub:'Gravitationsgigant',bonus:'+100% gesamte Produktion',req:{prestige:3},unlocked:false},
+  {id:'void',name:'DIE VOID',icon:'🌑',sub:'Jenseits der Realität',bonus:'+500% Dunkelmaterie',req:{prestige:5},unlocked:false},
+];
+
+const ACHIEVEMENTS = [
+  {id:'a1',name:'ERSTER SCHRITT',icon:'🚀',desc:'Kaufe dein erstes Gebäude',check:s=>totalBuildings(s)>=1,secret:false},
+  {id:'a2',name:'SAMMLER',icon:'🏗️',desc:'Besitze 10 Gebäude',check:s=>totalBuildings(s)>=10,secret:false},
+  {id:'a3',name:'BAUMEISTER',icon:'🏛️',desc:'Besitze 50 Gebäude',check:s=>totalBuildings(s)>=50,secret:false},
+  {id:'a4',name:'ENERGIE-LORD',icon:'⚡',desc:'1.000 Energie gesammelt',check:s=>s.totalEarned.energy>=1000,secret:false},
+  {id:'a5',name:'MEGA-ENERGIE',icon:'⚡⚡',desc:'1.000.000 Energie gesammelt',check:s=>s.totalEarned.energy>=1e6,secret:false},
+  {id:'a6',name:'KRISTALL-KÖNIG',icon:'💎',desc:'10.000 Kristalle gesammelt',check:s=>s.totalEarned.crystals>=10000,secret:false},
+  {id:'a7',name:'ERSTER PRESTIGE',icon:'✦',desc:'Führe deinen ersten Prestige durch',check:s=>s.totalPrestige>=1,secret:false},
+  {id:'a8',name:'PRESTIGE-LORD',icon:'✦✦',desc:'5 Mal Prestige durchgeführt',check:s=>s.totalPrestige>=5,secret:false},
+  {id:'a9',name:'FORSCHER',icon:'🔬',desc:'Forschung freigeschaltet',check:s=>s.researched.size>=1,secret:false},
+  {id:'a10',name:'GALAXIEN-REISE',icon:'🗺️',desc:'2. Zone betreten',check:s=>s.activeZone!=='sol',secret:false},
+  {id:'a11',name:'STREAK-MEISTER',icon:'🔥',desc:'7 Tage Streak',check:s=>s.streak>=7,secret:false},
+  {id:'a12',name:'VOID-PIONIER',icon:'🌑',desc:'Void-Portal gebaut',check:s=>(s.buildings.void_gate||0)>=1,secret:true},
+  {id:'a13',name:'TAP-MANIAC',icon:'👆',desc:'1000 Mal geklickt',check:s=>s.totalTaps>=1000,secret:false},
+  {id:'a14',name:'BOSS-JÄGER',icon:'👾',desc:'Ersten Boss besiegt',check:s=>s.bossesDefeated>=1,secret:false},
+  {id:'a15',name:'???',icon:'🔮',desc:'Erreiche das Endgame',check:s=>s.totalPrestige>=10,secret:true},
+];
+
+const CHALLENGES = [
+  {id:'c1',name:'HALF-SPEED',desc:'Produziere mit 50% Effizienz',reward:'×3 PP beim Prestige',multiplier:3,costMult:1,prodMult:0.5},
+  {id:'c2',name:'KEIN REAKTOR',desc:'Kein Fusionsreaktor erlaubt',reward:'×2 PP + gratis Upgrade',multiplier:2,restriction:'reactor'},
+];
+
+const DAILY_MISSIONS_POOL = [
+  {id:'m1',name:'ENERGIE-SPRINT',icon:'⚡',desc:'Sammle 10.000 Energie',type:'earn',resource:'energy',target:10000,reward:{pp:1}},
+  {id:'m2',name:'BAUFIEBER',icon:'🏗️',desc:'Kaufe 5 Gebäude',type:'buy',target:5,reward:{energy:5000}},
+  {id:'m3',name:'KRISTALL-JAGD',icon:'💎',desc:'Sammle 1.000 Kristalle',type:'earn',resource:'crystals',target:1000,reward:{pp:1}},
+  {id:'m4',name:'FORSCHER',icon:'🔬',desc:'Schließe eine Forschung ab',type:'research',target:1,reward:{crystals:2000}},
+  {id:'m5',name:'TAP-MARATHON',icon:'👆',desc:'Klicke 100 Mal',type:'tap',target:100,reward:{energy:3000}},
+];
+
+const BOSS_POOL = [
+  {name:'VOID DESTROYER',icon:'👾',hp:100,reward:{energy:50000,pp:2}},
+  {name:'DARK LEVIATHAN',icon:'🦑',hp:200,reward:{energy:200000,crystals:5000,pp:5}},
+  {name:'COSMIC TITAN',icon:'🤖',hp:500,reward:{energy:1000000,crystals:20000,pp:10}},
+];
+
+// ==================== STATE ====================
+const S = {
+  energy:0, crystals:0, dark:0,
+  totalEarned:{energy:0,crystals:0,dark:0},
+  pp:0, totalPrestige:0,
+  buildings:{},
+  upgrades:new Set(),
+  researched:new Set(),
+  activeZone:'sol',
+  streak:0, lastLogin:null,
+  missions:[], missionProgress:{},
+  achievements:new Set(),
+  totalTaps:0, sessionTaps:0,
+  bossesDefeated:0,
+  activeChallenge:null,
+  eventActive:false, eventMult:1, eventTimer:0,
+  specialActive:false, specialTimer:0,
+  boss:null, bossActive:false,
+  lastSave: Date.now(),
+  lastTick: Date.now(),
+};
+
+BUILDINGS.forEach(b=>{ S.buildings[b.id]=0; });
+
+// ==================== SAVE/LOAD ====================
+function saveGame() {
+  const save = {
+    energy:S.energy, crystals:S.crystals, dark:S.dark,
+    totalEarned:S.totalEarned, pp:S.pp, totalPrestige:S.totalPrestige,
+    buildings:S.buildings, upgrades:[...S.upgrades], researched:[...S.researched],
+    activeZone:S.activeZone, streak:S.streak, lastLogin:S.lastLogin,
+    missions:S.missions, missionProgress:S.missionProgress,
+    achievements:[...S.achievements], totalTaps:S.totalTaps,
+    bossesDefeated:S.bossesDefeated, lastSave:Date.now(),
+  };
+  try { localStorage.setItem('ge2_save', JSON.stringify(save)); } catch(e){}
+}
+
+function loadGame() {
+  try {
+    const raw = localStorage.getItem('ge2_save');
+    if (!raw) return false;
+    const d = JSON.parse(raw);
+    Object.assign(S, d);
+    S.upgrades = new Set(d.upgrades||[]);
+    S.researched = new Set(d.researched||[]);
+    S.achievements = new Set(d.achievements||[]);
+    S.lastTick = Date.now();
+    return d.lastSave || null;
+  } catch(e){ return false; }
+}
+
+// ==================== HELPERS ====================
+function fmt(n) {
+  if (n<1000) return Math.floor(n)+'';
+  if (n<1e6) return (n/1000).toFixed(1)+'K';
+  if (n<1e9) return (n/1e6).toFixed(2)+'M';
+  if (n<1e12) return (n/1e9).toFixed(2)+'B';
+  return (n/1e12).toFixed(2)+'T';
+}
+function totalBuildings(s) {
+  return Object.values(s.buildings).reduce((a,b)=>a+b,0);
+}
+function getEff(type) {
+  let mult=1;
+  S.upgrades.forEach(id=>{
+    const u=PRESTIGE_UPGRADES.find(x=>x.id===id);
+    if(!u) return;
+    if(u.effect===type) mult+=u.val;
+    if(u.effect==='gMult' && (type==='eMult'||type==='cMult')) mult+=u.val;
+  });
+  S.researched.forEach(id=>{
+    const r=RESEARCH.find(x=>x.id===id);
+    if(!r) return;
+    if(r.effect===type) mult+=r.val;
+    if(r.effect==='gMult' && (type==='eMult'||type==='cMult')) mult+=r.val;
+  });
+  return mult;
+}
+function getCostRed() {
+  let red=1;
+  S.upgrades.forEach(id=>{const u=PRESTIGE_UPGRADES.find(x=>x.id===id);if(u&&u.effect==='costRed') red*=u.val;});
+  S.researched.forEach(id=>{const r=RESEARCH.find(x=>x.id===id);if(r&&r.effect==='costRed') red-=r.val;});
+  return Math.max(0.1, red);
+}
+function getZoneBonus(type) {
+  const zone = GALAXY_ZONES.find(z=>z.id===S.activeZone);
+  if (!zone) return 1;
+  const bonuses = {sol:1,alpha:type==='energy'?1.25:1,nebula:type==='crystals'?1.5:1,blackhole:2,void:type==='dark'?6:1};
+  return bonuses[S.activeZone]||1;
+}
+function getStreakBonus() { return 1 + Math.min(S.streak,30)*0.01; }
+function getMilestoneMult(bId) {
+  const cnt = S.buildings[bId]||0;
+  let mult=1;
+  if(cnt>=10) mult*=2;
+  if(cnt>=25) mult*=1.5;
+  if(cnt>=50) mult*=2;
+  return mult;
+}
+function getSynergyBonus() {
+  const hasReactor = (S.buildings.reactor||0)>=10;
+  const hasDyson = (S.buildings.dyson||0)>=1;
+  return (hasReactor && hasDyson) ? 1.5 : 1;
+}
+function getProduction() {
+  const em=getEff('eMult'), cm=getEff('cMult'), dm=getEff('dMult')||1;
+  const cr=getCostRed(), streak=getStreakBonus(), synergy=getSynergyBonus();
+  const chal = S.activeChallenge ? CHALLENGES.find(c=>c.id===S.activeChallenge) : null;
+  const chalMult = chal ? chal.prodMult : 1;
+  let energy=0, crystals=0, dark=0;
+  BUILDINGS.forEach(b=>{
+    const cnt = S.buildings[b.id]||0;
+    if(!cnt) return;
+    if(chal && chal.restriction===b.id) return;
+    const mm = getMilestoneMult(b.id);
+    if(b.prod.energy) energy += b.prod.energy*cnt*mm*em*getZoneBonus('energy')*synergy*streak*S.eventMult*chalMult;
+    if(b.prod.crystals) crystals += b.prod.crystals*cnt*mm*cm*getZoneBonus('crystals')*streak*S.eventMult*chalMult;
+    if(b.prod.dark && S.upgrades.has('dm1')) dark += b.prod.dark*cnt*mm*dm*streak;
+  });
+  return {energy, crystals, dark};
+}
+function getBuildingCost(b) {
+  const cnt = S.buildings[b.id]||0;
+  const red = getCostRed();
+  const cost={};
+  for(const [r,base] of Object.entries(b.baseCost)) cost[r]=Math.floor(base*Math.pow(1.15,cnt)*red);
+  return cost;
+}
+function canAfford(cost) {
+  for(const [r,a] of Object.entries(cost)){
+    if(r==='energy'&&S.energy<a) return false;
+    if(r==='crystals'&&S.crystals<a) return false;
+    if(r==='dark'&&S.dark<a) return false;
+  }
+  return true;
+}
+function spend(cost) {
+  for(const [r,a] of Object.entries(cost)){
+    if(r==='energy') S.energy-=a;
+    if(r==='crystals') S.crystals-=a;
+    if(r==='dark') S.dark-=a;
+  }
+}
+function calcPP() {
+  const total = totalBuildings(S);
+  const chal = S.activeChallenge ? CHALLENGES.find(c=>c.id===S.activeChallenge) : null;
+  return Math.max(0, Math.floor(Math.sqrt(total/3) + S.totalPrestige)) * (chal?chal.multiplier:1);
+}
+
+// ==================== ACTIONS ====================
+function buyBuilding(id) {
+  const b=BUILDINGS.find(x=>x.id===id);
+  const chal=S.activeChallenge?CHALLENGES.find(c=>c.id===S.activeChallenge):null;
+  if(chal&&chal.restriction===id){showToast('❌ Challenge: '+b.name+' gesperrt!');return;}
+  const cost=getBuildingCost(b);
+  if(!canAfford(cost)) return;
+  spend(cost);
+  S.buildings[id]=(S.buildings[id]||0)+1;
+  // Mission tracking
+  const m=S.missions.find(x=>x.type==='buy');
+  if(m&&!m.done) S.missionProgress[m.id]=(S.missionProgress[m.id]||0)+1;
+  // Boss check
+  if(totalBuildings(S)%100===0 && totalBuildings(S)>0) spawnBoss();
+  // Achievement check
+  checkAchievements();
+  spawnFloatNum('+1 '+b.icon, 'gold');
+  soundBuy();
+  showToast(b.icon+' '+b.name+' gebaut!');
+  renderBuildings(); updateHUD();
+}
+
+function tapBuilding(id, evt) {
+  evt.stopPropagation();
+  const b=BUILDINGS.find(x=>x.id===id);
+  if(!b) return;
+  const tapMult=getEff('tapMult');
+  const prod=getProduction();
+  const gain=Math.max(1,(prod.energy+1)*0.1*tapMult);
+  S.energy+=gain; S.totalEarned.energy+=gain;
+  S.totalTaps++; S.sessionTaps++;
+  soundTap();
+  const m=S.missions.find(x=>x.type==='tap');
+  if(m&&!m.done) S.missionProgress[m.id]=(S.missionProgress[m.id]||0)+1;
+  spawnFloatNum('+'+fmt(gain)+'⚡','cyan');
+  checkAchievements();
+}
+
+function doPrestige() {
+  const gain=calcPP(); if(gain<=0) return;
+  S.pp+=gain; S.totalPrestige++;
+  BUILDINGS.forEach(b=>{ S.buildings[b.id]=0; });
+  S.energy=0; S.crystals=0; S.dark=0;
+  S.activeChallenge=null;
+  showCinematic(gain);
+  checkAchievements();
+  setTimeout(()=>{ render(); },2600);
+}
+
+function buyUpgrade(id) {
+  const u=PRESTIGE_UPGRADES.find(x=>x.id===id);
+  if(!u||S.upgrades.has(id)||S.pp<u.cost) return;
+  S.pp-=u.cost; S.upgrades.add(id);
+  showToast('⚡ '+u.name+' aktiviert!');
+  renderPrestige(); updateHUD();
+}
+
+function doResearch(id) {
+  const r=RESEARCH.find(x=>x.id===id);
+  if(!r||S.researched.has(id)) return;
+  const req=r.req.every(rid=>S.researched.has(rid));
+  if(!req){showToast('❌ Voraussetzung fehlt!');return;}
+  if(!canAfford(r.cost)){showToast('❌ Zu wenige Kristalle!');return;}
+  spend(r.cost); S.researched.add(id);
+  const m=S.missions.find(x=>x.type==='research');
+  if(m&&!m.done) S.missionProgress[m.id]=(S.missionProgress[m.id]||0)+1;
+  showToast('🔬 '+r.name+' erforscht!');
+  checkAchievements();
+  renderResearch(); updateHUD();
+}
+
+function setZone(id) {
+  const z=GALAXY_ZONES.find(x=>x.id===id);
+  if(!z) return;
+  if(!z.unlocked&&!(S.totalPrestige>=(z.req&&z.req.prestige||0))){showToast('❌ '+z.name+' noch gesperrt!');return;}
+  S.activeZone=id;
+  // Unlock zone
+  z.unlocked=true;
+  showToast('🗺 Zone gewechselt: '+z.name);
+  renderGalaxy(); updateHUD();
+}
+
+function startChallenge(id) {
+  if(S.activeChallenge){showToast('❌ Challenge bereits aktiv!');return;}
+  S.activeChallenge=id;
+  showToast('⚔️ Challenge gestartet!');
+  renderPrestige();
+}
+
+function spawnBoss() {
+  const boss=BOSS_POOL[Math.min(Math.floor(S.bossesDefeated/1),BOSS_POOL.length-1)];
+  S.boss={...boss,currentHp:boss.hp};
+  S.bossActive=true;
+  document.getElementById('boss-overlay').style.display='block';
+  document.getElementById('boss-icon').textContent=boss.icon;
+  document.getElementById('boss-name').textContent=boss.name;
+  updateBossUI();
+  showToast('👾 '+boss.name+' erschienen!');
+}
+
+function attackBoss() {
+  if(!S.boss) return;
+  const dmg = Math.max(1,Math.floor(totalBuildings(S)/10));
+  S.boss.currentHp=Math.max(0,S.boss.currentHp-dmg);
+  spawnFloatNum('-'+dmg+'💥','red');
+  if(S.boss.currentHp<=0) {
+    const r=S.boss.reward;
+    if(r.energy){S.energy+=r.energy;S.totalEarned.energy+=r.energy;}
+    if(r.crystals){S.crystals+=r.crystals;S.totalEarned.crystals+=r.crystals;}
+    if(r.pp) S.pp+=r.pp;
+    S.bossesDefeated++;
+    S.bossActive=false;
+    document.getElementById('boss-overlay').style.display='none';
+    checkAchievements();
+    showToast('🏆 Boss besiegt! +'+fmt(r.energy||0)+'⚡ +'+r.pp+'PP');
+    return;
+  }
+  updateBossUI();
+}
+
+function updateBossUI() {
+  if(!S.boss) return;
+  const pct=(S.boss.currentHp/S.boss.hp)*100;
+  document.getElementById('boss-hp').style.width=pct+'%';
+  document.getElementById('boss-hp-text').textContent=Math.ceil(pct)+'%';
+}
+
+// SPECIAL BUILDING
+const SPECIALS=[
+  {name:'ALIEN-ARTEFAKT',icon:'🛸',reward:'×10 Energie (30s)',type:'event',mult:10,dur:30},
+  {name:'KOSMISCHER TROPFEN',icon:'💫',reward:'+5000 Kristalle sofort',type:'crystals',amount:5000},
+  {name:'PRESTIGE-SPLITTER',icon:'✦',reward:'+1 Prestige-Punkt',type:'pp',amount:1},
+  {name:'ENERGIE-NOVA',icon:'⚡',reward:'+50.000 Energie sofort',type:'energy',amount:50000},
+];
+function maybeSpawnSpecial() {
+  if(S.specialActive) return;
+  if(Math.random()<0.003 && totalBuildings(S)>0) {
+    const sp=SPECIALS[Math.floor(Math.random()*SPECIALS.length)];
+    S.specialActive=true; S.specialTimer=60; S._currentSpecial=sp;
+    document.getElementById('special-overlay').style.display='block';
+    document.getElementById('special-icon').textContent=sp.icon;
+    document.getElementById('special-name').textContent=sp.name;
+    document.getElementById('special-reward').textContent=sp.reward;
+  }
+}
+function claimSpecial() {
+  if(!S._currentSpecial) return;
+  const sp=S._currentSpecial;
+  if(sp.type==='energy'){S.energy+=sp.amount;S.totalEarned.energy+=sp.amount;spawnFloatNum('+'+fmt(sp.amount)+'⚡','gold');}
+  if(sp.type==='crystals'){S.crystals+=sp.amount;S.totalEarned.crystals+=sp.amount;spawnFloatNum('+'+fmt(sp.amount)+'💎','cyan');}
+  if(sp.type==='pp'){S.pp+=sp.amount;spawnFloatNum('+'+sp.amount+'PP','purple');}
+  if(sp.type==='event'){S.eventActive=true;S.eventMult=sp.mult;S.eventTimer=sp.dur;showEvent('⚡ ENERGIE-BOOST!','×'+sp.mult+' Produktion für '+sp.dur+'s',sp.mult);}
+  S.specialActive=false; S._currentSpecial=null;
+  document.getElementById('special-overlay').style.display='none';
+  showToast('✨ '+sp.name+' eingesammelt!');
+}
+
+// EVENT
+function maybeSpawnEvent() {
+  if(S.eventActive) return;
+  if(Math.random()<0.0008 && totalBuildings(S)>=5) {
+    const events=[
+      {title:'⚡ SONNENSTURM!',desc:'2× Produktion für 30 Sekunden',mult:2,dur:30},
+      {title:'💎 KRISTALLREGEN',desc:'3× Kristalle für 20 Sekunden',mult:3,dur:20},
+      {title:'🌌 KOSMISCHE WELLE',desc:'5× Produktion für 15 Sekunden',mult:5,dur:15},
+    ];
+    const ev=events[Math.floor(Math.random()*events.length)];
+    S.eventActive=true; S.eventMult=ev.mult; S.eventTimer=ev.dur;
+    showEvent(ev.title,ev.desc,ev.mult);
+  }
+}
+function showEvent(title,desc,mult) {
+  soundEvent();
+  document.getElementById('event-title').textContent=title;
+  document.getElementById('event-desc').textContent=desc;
+  document.getElementById('event-popup').classList.add('show');
+}
+
+// ACHIEVEMENTS
+function checkAchievements() {
+  let newUnlocks=[];
+  ACHIEVEMENTS.forEach(a=>{
+    if(!S.achievements.has(a.id) && a.check(S)){
+      S.achievements.add(a.id);
+      newUnlocks.push(a);
+    }
+  });
+  if(newUnlocks.length) {
+    soundAchievement();
+    setTimeout(()=>{
+      newUnlocks.forEach((a,i)=>{
+        setTimeout(()=>showToast('🏆 ACHIEVEMENT: '+a.name),i*1500);
+      });
+      renderMissions();
+    },200);
+  }
+}
+
+// DAILY MISSIONS
+function initMissions() {
+  const today=new Date().toDateString();
+  const saved=localStorage.getItem('ge2_missions_date');
+  if(saved!==today) {
+    localStorage.setItem('ge2_missions_date',today);
+    S.missions=[...DAILY_MISSIONS_POOL].sort(()=>Math.random()-0.5).slice(0,3);
+    S.missionProgress={};
+    S.missions.forEach(m=>{ S.missionProgress[m.id]=0; m.done=false; });
+    localStorage.setItem('ge2_missions',JSON.stringify(S.missions));
+  } else {
+    try {
+      const saved2=JSON.parse(localStorage.getItem('ge2_missions')||'[]');
+      if(saved2.length) { S.missions=saved2; S.missionProgress=S.missionProgress||{}; }
+    } catch(e){}
+  }
+  // STREAK
+  const lastLogin=localStorage.getItem('ge2_last_login');
+  const todayStr=new Date().toDateString();
+  const yesterdayStr=new Date(Date.now()-86400000).toDateString();
+  if(lastLogin===todayStr) { /* same day */ }
+  else if(lastLogin===yesterdayStr) { S.streak=(S.streak||0)+1; showToast('🔥 '+S.streak+' Tage Streak!'); }
+  else { S.streak=1; }
+  localStorage.setItem('ge2_last_login',todayStr);
+}
+
+function checkMissions() {
+  S.missions.forEach(m=>{
+    if(m.done) return;
+    let prog=S.missionProgress[m.id]||0;
+    if(m.type==='earn') prog=S.totalEarned[m.resource]||0;
+    if(prog>=m.target) completeMission(m);
+  });
+}
+
+function completeMission(m) {
+  m.done=true;
+  if(m.reward.pp) { S.pp+=m.reward.pp; showToast('✅ Mission: +'+m.reward.pp+'PP'); }
+  if(m.reward.energy) { S.energy+=m.reward.energy; showToast('✅ Mission: +'+fmt(m.reward.energy)+'⚡'); }
+  if(m.reward.crystals) { S.crystals+=m.reward.crystals; showToast('✅ Mission: +'+fmt(m.reward.crystals)+'💎'); }
+  document.getElementById('mission-notif').style.display='block';
+  checkAchievements();
+}
+
+// ==================== OFFLINE ====================
+function checkOffline(lastSave) {
+  if(!lastSave) return;
+  const offline=(Date.now()-lastSave)/1000;
+  if(offline<60) return;
+  const maxOffline=8*3600;
+  const actual=Math.min(offline,maxOffline);
+  const prod=getProduction();
+  const gained={energy:prod.energy*actual, crystals:prod.crystals*actual};
+  if(gained.energy<1&&gained.crystals<1) return;
+  document.getElementById('offline-energy').textContent=fmt(gained.energy);
+  document.getElementById('offline-crystals').textContent=fmt(gained.crystals);
+  document.getElementById('offline-desc').textContent=
+    'Du warst '+Math.floor(actual/60)+' Minuten weg. Dein Imperium hat gearbeitet!';
+  document.getElementById('offline-modal').style.display='flex';
+  window._offlineGain=gained;
+}
+
+function collectOffline() {
+  if(window._offlineGain) {
+    S.energy+=window._offlineGain.energy;
+    S.crystals+=window._offlineGain.crystals;
+    S.totalEarned.energy+=window._offlineGain.energy;
+    S.totalEarned.crystals+=window._offlineGain.crystals;
+  }
+  document.getElementById('offline-modal').style.display='none';
+  updateHUD();
+}
+
+// ==================== CINEMATIC ====================
+function showCinematic(gain) {
+  soundPrestige();
+  const el=document.getElementById('prestige-cinematic');
+  document.getElementById('cine-title').textContent='PRESTIGE #'+S.totalPrestige+' VOLLZOGEN';
+  document.getElementById('cine-sub').textContent='+'+gain+' PRESTIGE-PUNKTE ERHALTEN';
+  el.style.display='flex';
+  setTimeout(()=>{ el.style.display='none'; },2500);
+}
+
+// ==================== VOID CONTENT ====================
+function renderVoid() {
+  const el=document.getElementById('void-content');
+  if(S.totalPrestige<5) {
+    el.innerHTML=`<div class="void-locked">
+      <div class="void-locked-icon">🌑</div>
+      <div class="void-locked-title">VOID GESPERRT</div>
+      <div class="void-locked-desc">Die Void-Dimension öffnet sich nach 5 Prestige-Durchgängen.<br><br>Du hast ${S.totalPrestige}/5 Prestige erreicht.</div>
+    </div>`;
+  } else {
+    el.innerHTML=`<div style="padding:14px">
+      <div style="background:rgba(26,10,46,0.8);border:1px solid rgba(123,47,190,0.4);border-radius:14px;padding:16px;text-align:center">
+        <div style="font-size:40px;margin-bottom:10px">🌑</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:13px;color:var(--purple2);letter-spacing:2px;margin-bottom:8px">VOID AKTIV</div>
+        <div style="font-size:11px;color:var(--text-dim);line-height:1.5">Du hast die Void-Dimension betreten. Dunkelmaterie fließt durch dein Imperium.<br><br>
+        <span style="color:var(--gold);font-family:'Share Tech Mono',monospace">🌑 ${fmt(S.dark)} Dunkelmaterie</span></div>
+        <div style="margin-top:12px;padding:10px;background:rgba(255,255,255,0.04);border-radius:9px">
+          <div style="font-size:10px;color:var(--text-dim)">VOID BONUS</div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:16px;color:var(--purple2);margin-top:4px">×${(1+S.dark*0.001).toFixed(2)} Alle Produktion</div>
+        </div>
+      </div>
+    </div>`;
+  }
+}
+
+// ==================== RENDER ====================
+function renderBuildings() {
+  const grid=document.getElementById('buildings-grid');
+  grid.innerHTML='';
+  BUILDINGS.forEach(b=>{
+    const cnt=S.buildings[b.id]||0;
+    if(b.requiresPrestige && S.totalPrestige<b.requiresPrestige && cnt===0) return;
+    const cost=getBuildingCost(b);
+    const afford=canAfford(cost);
+    const prod=getProduction();
+    const costStr=Object.entries(cost).map(([r,v])=>`${r==='energy'?'⚡':r==='crystals'?'💎':'🌑'} ${fmt(v)}`).join(' + ');
+    const prodParts=[];
+    const mm=getMilestoneMult(b.id);
+    const em=getEff('eMult'), cm=getEff('cMult');
+    if(b.prod.energy) prodParts.push(`⚡${fmt(b.prod.energy*cnt*mm*em*getZoneBonus('energy')*getStreakBonus()*S.eventMult)}/s`);
+    if(b.prod.crystals) prodParts.push(`💎${fmt(b.prod.crystals*cnt*mm*cm*getZoneBonus('crystals')*getStreakBonus()*S.eventMult)}/s`);
+    if(b.prod.dark && S.upgrades.has('dm1')) prodParts.push(`🌑${fmt(b.prod.dark*cnt)}/s`);
+    const milestones=b.milestones.map(m=>`<div class="milestone${cnt>=m.n?' reached':''}">${m.n}<br><span style="font-size:7px">${m.bonus}</span></div>`).join('');
+    const locked=b.requiresPrestige&&S.totalPrestige<b.requiresPrestige?'locked':'';
+    const hasSynergy=(b.id==='reactor'&&(S.buildings.dyson||0)>=1);
+
+    const card=document.createElement('div');
+    card.className=`building-card ${afford?'affordable':''} ${locked}`;
+    card.id='card-'+b.id;
+    card.innerHTML=`
+      <div class="card-accent" style="background:${b.grad}"></div>
+      <div class="card-top">
+        <div class="building-icon" style="background:${b.grad}">${b.icon}</div>
+        <div class="card-info">
+          <div class="building-name">${b.name}</div>
+          <div class="building-desc">${b.desc}${b.requiresPrestige?`<br><span style="color:var(--purple2);font-size:9px">Erfordert ${b.requiresPrestige}× Prestige</span>`:''}</div>
+          <div class="building-stats">${prodParts.map(p=>`<div class="stat-chip">${p}</div>`).join('')}</div>
+          ${hasSynergy?`<div class="synergy-badge">⚡ Synergie aktiv!</div>`:''}
+        </div>
+        <div class="building-count">${cnt}<span class="owned-label">GEBAUT</span></div>
+      </div>
+      <div class="milestones">${milestones}</div>
+      <div class="level-row"><span class="level-label">MILESTONE BONUS</span><span class="level-num">×${mm.toFixed(1)}</span></div>
+      <div class="level-bar-bg"><div class="level-bar-fill" style="width:${Math.min((cnt/50)*100,100)}%;background:${b.grad}"></div></div>
+      <div class="buy-row">
+        <button class="buy-btn" onclick="buyBuilding('${b.id}')" ${afford?'':'disabled'}>
+          <span class="btn-label">KAUFEN</span>
+          <span class="btn-cost">${costStr}</span>
+        </button>
+        <button class="tap-btn" onclick="tapBuilding('${b.id}',event)" title="Manuell produzieren">👆</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function renderPrestige() {
+  const pp=calcPP();
+  document.getElementById('pp-gain-display').textContent=pp+' PP';
+  document.getElementById('pp-total').textContent=S.pp;
+  document.getElementById('prestige-count').textContent=S.totalPrestige;
+  const ranks=['I','II','III','IV','V','VI','VII','∞'];
+  document.getElementById('prestige-rank').textContent=ranks[Math.min(S.totalPrestige,ranks.length-1)];
+  document.getElementById('prestige-btn').disabled=pp<=0;
+
+  const cl=document.getElementById('challenges-list');
+  cl.innerHTML=CHALLENGES.map(c=>`
+    <div class="challenge-item ${S.activeChallenge===c.id?'active-challenge':''}" onclick="startChallenge('${c.id}')">
+      <div class="challenge-title">⚔️ ${c.name}</div>
+      <div class="challenge-desc">${c.desc}</div>
+      <div class="challenge-reward">Belohnung: ${c.reward}</div>
+    </div>`).join('');
+
+  const ug=document.getElementById('upgrades-grid');
+  ug.innerHTML='';
+  PRESTIGE_UPGRADES.forEach(u=>{
+    const p=S.upgrades.has(u.id);
+    const cb=!p&&S.pp>=u.cost;
+    const div=document.createElement('div');
+    div.className=`upgrade-card ${p?'purchased':cb?'purchasable':''}`;
+    if(!p) div.onclick=()=>buyUpgrade(u.id);
+    div.innerHTML=`<div class="upgrade-tier tier-${u.tier}">T${u.tier}</div>
+      <div class="upgrade-icon">${u.icon}</div>
+      <div class="upgrade-name">${u.name}</div>
+      <div class="upgrade-desc">${u.desc}</div>
+      <div class="upgrade-cost ${p?'purchased':''}">${p?'✓ AKTIV':'✦ '+u.cost+' PP'}</div>`;
+    ug.appendChild(div);
+  });
+}
+
+function renderGalaxy() {
+  const el=document.getElementById('galaxy-zones');
+  el.innerHTML='';
+  GALAXY_ZONES.forEach(z=>{
+    const unlocked=z.unlocked||(z.req&&S.totalPrestige>=z.req.prestige)||!z.req;
+    const isActive=S.activeZone===z.id;
+    const div=document.createElement('div');
+    div.className=`zone-card ${unlocked?'unlocked':'locked'} ${isActive?'active-zone':''}`;
+    div.onclick=()=>setZone(z.id);
+    div.innerHTML=`${isActive?'<div class="zone-active-badge">AKTIV</div>':''}
+      <div class="zone-header">
+        <div class="zone-icon">${z.icon}</div>
+        <div><div class="zone-name">${z.name}</div><div class="zone-sub">${z.sub}</div></div>
+      </div>
+      <div class="zone-bonus">${z.bonus}</div>
+      ${!unlocked?`<div class="zone-req">Erfordert ${z.req.prestige}× Prestige</div>`:''}`;
+    el.appendChild(div);
+  });
+}
+
+function renderResearch() {
+  const el=document.getElementById('research-grid');
+  el.innerHTML='';
+  RESEARCH.forEach(r=>{
+    const done=S.researched.has(r.id);
+    const reqMet=r.req.every(x=>S.researched.has(x));
+    const avail=!done&&reqMet;
+    const costStr=Object.entries(r.cost).map(([res,v])=>`💎 ${fmt(v)}`).join(', ');
+    const div=document.createElement('div');
+    div.className=`research-node ${done?'researched':avail?'available':''}`;
+    div.onclick=()=>doResearch(r.id);
+    div.innerHTML=`<div class="rn-icon">${r.icon}</div>
+      <div class="rn-info">
+        <div class="rn-name">${r.name}</div>
+        <div class="rn-desc">${r.desc}</div>
+        ${!done?`<div class="rn-cost">${costStr}</div>`:''} 
+        ${!reqMet&&!done?`<div style="font-size:9px;color:var(--text-dim);margin-top:2px">🔒 Vorherige Forschung benötigt</div>`:''}
+      </div>
+      <div class="rn-status">${done?'✅':avail?'🔬':'🔒'}</div>`;
+    el.appendChild(div);
+  });
+}
+
+function renderMissions() {
+  const ml=document.getElementById('missions-list');
+  ml.innerHTML='';
+  document.getElementById('streak-days').textContent=S.streak||0;
+  document.getElementById('streak-bonus-text').textContent=`+${Math.min((S.streak||0),30)}% Produktion durch Streak`;
+  S.missions.forEach(m=>{
+    let prog=S.missionProgress[m.id]||0;
+    if(m.type==='earn') prog=S.totalEarned[m.resource]||0;
+    const pct=Math.min((prog/m.target)*100,100);
+    const rewardStr=m.reward.pp?`+${m.reward.pp}PP`:m.reward.energy?`+${fmt(m.reward.energy)}⚡`:`+${fmt(m.reward.crystals)}💎`;
+    const div=document.createElement('div');
+    div.className=`mission-item ${m.done?'completed':''}`;
+    div.innerHTML=`<div class="mission-icon">${m.icon}</div>
+      <div class="mission-info">
+        <div class="mission-name">${m.name}</div>
+        <div class="mission-desc">${m.desc} (${fmt(Math.min(prog,m.target))}/${fmt(m.target)})</div>
+        <div class="mission-bar-bg"><div class="mission-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+      ${m.done?'<div class="mission-check">✅</div>':`<div class="mission-reward">${rewardStr}</div>`}`;
+    ml.appendChild(div);
+  });
+
+  const ag=document.getElementById('achievements-grid');
+  ag.innerHTML='';
+  ACHIEVEMENTS.forEach(a=>{
+    const unlocked=S.achievements.has(a.id);
+    const div=document.createElement('div');
+    div.className=`ach-card ${unlocked?'unlocked':''} ${a.secret&&!unlocked?'secret':''}`;
+    div.innerHTML=`<div class="ach-icon">${a.secret&&!unlocked?'❓':a.icon}</div>
+      <div class="ach-name">${a.secret&&!unlocked?'???':a.name}</div>`;
+    ag.appendChild(div);
+  });
+}
+
+function render() {
+  renderBuildings();
+  renderPrestige();
+  renderGalaxy();
+  renderResearch();
+  renderMissions();
+  renderVoid();
+  updateHUD();
+}
+
+// ==================== HUD ====================
+function updateHUD() {
+  document.getElementById('energy-display').textContent=fmt(S.energy);
+  document.getElementById('crystal-display').textContent=fmt(S.crystals);
+  document.getElementById('dark-display').textContent=fmt(S.dark);
+  const p=getProduction();
+  document.getElementById('energy-rate').textContent='+'+fmt(p.energy)+'/s';
+  document.getElementById('crystal-rate').textContent='+'+fmt(p.crystals)+'/s';
+  document.getElementById('dark-rate').textContent='+'+fmt(p.dark)+'/s';
+  document.getElementById('pp-val').textContent=S.pp;
+  document.getElementById('streak-val').textContent=S.streak||0;
+  // Empire rank
+  const tb=totalBuildings(S);
+  const ranks2=['NOVICE COMMANDER','STAR CAPTAIN','GALACTIC LORD','COSMIC EMPEROR','VOID GOD','OMNIPOTENT'];
+  const rank=ranks2[Math.min(Math.floor(S.totalPrestige/2),ranks2.length-1)];
+  document.getElementById('empire-rank').textContent=rank+' · '+tb+' GEBÄUDE';
+  // Next goal
+  updateGoal();
+  // Nebula color based on prestige
+  const hue=S.totalPrestige*15;
+  document.getElementById('nebula').style.background=
+    `radial-gradient(ellipse 60% 40% at 20% 30%,rgba(${123+hue},47,190,0.09) 0%,transparent 70%),
+     radial-gradient(ellipse 50% 60% at 80% 70%,rgba(0,212,255,0.07) 0%,transparent 70%)`;
+}
+
+function updateGoal() {
+  const goals=[
+    {text:'Kaufe ersten Solarkollektor',check:()=>S.buildings.solar>=1,prog:()=>Math.min(S.energy/10*100,100)},
+    {text:'Kaufe erste Kristallmine',check:()=>S.buildings.mine>=1,prog:()=>Math.min(S.energy/80*100,100)},
+    {text:'Kaufe Fusionsreaktor',check:()=>S.buildings.reactor>=1,prog:()=>Math.min(S.energy/350*100,100)},
+    {text:'Erreiche 10 Solarkollektoren',check:()=>S.buildings.solar>=10,prog:()=>Math.min((S.buildings.solar/10)*100,100)},
+    {text:'Kaufe Quantumlabor',check:()=>S.buildings.lab>=1,prog:()=>Math.min(S.crystals/5*100,100)},
+    {text:'Kaufe Raumstation',check:()=>S.buildings.station>=1,prog:()=>Math.min(Math.min(S.energy/2000,S.crystals/25)*100,100)},
+    {text:'Führe ersten Prestige durch',check:()=>S.totalPrestige>=1,prog:()=>Math.min(totalBuildings(S)/10*100,100)},
+    {text:'Kaufe Dyson-Sphäre',check:()=>S.buildings.dyson>=1,prog:()=>Math.min(S.energy/15000*100,100)},
+    {text:'Kaufe 50 Gebäude total',check:()=>totalBuildings(S)>=50,prog:()=>Math.min(totalBuildings(S)/50*100,100)},
+    {text:'3× Prestige durchführen',check:()=>S.totalPrestige>=3,prog:()=>Math.min(S.totalPrestige/3*100,100)},
+  ];
+  const active=goals.find(g=>!g.check());
+  if(active) {
+    document.getElementById('goal-text').textContent=active.text;
+    document.getElementById('goal-bar').style.width=active.prog()+'%';
+  } else {
+    document.getElementById('goal-text').textContent='🏆 Du bist ein Meister des Imperiums!';
+    document.getElementById('goal-bar').style.width='100%';
+  }
+}
+
+// ==================== UI HELPERS ====================
+function spawnFloatNum(text, type='gold') {
+  const el=document.createElement('div');
+  el.className='float-num '+type;
+  el.textContent=text;
+  el.style.left=(Math.random()*60+20)+'%';
+  el.style.top='30%';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1300);
+}
+
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='prestige') renderPrestige();
+  if(name==='galaxy') renderGalaxy();
+  if(name==='research') renderResearch();
+  if(name==='market'){renderMarket();document.getElementById('market-notif').style.display='none';}
+  if(name==='missions'){renderMissions();document.getElementById('mission-notif').style.display='none';}
+  if(name==='void') renderVoid();
+}
+
+// ==================== CANVAS STARS ====================
+function initCanvas() {
+  const c=document.getElementById('bg-canvas');
+  const ctx=c.getContext('2d');
+  c.width=window.innerWidth; c.height=window.innerHeight;
+  const stars=[];
+  for(let i=0;i<180;i++) stars.push({x:Math.random()*c.width,y:Math.random()*c.height,
+    r:Math.random()*1.5+0.3,a:Math.random(),s:Math.random()*0.005+0.001,
+    col:['rgba(255,184,0','rgba(0,212,255','rgba(255,255,255','rgba(123,47,190'][Math.floor(Math.random()*4)]});
+  function draw() {
+    ctx.clearRect(0,0,c.width,c.height);
+    stars.forEach(s=>{
+      s.a+=s.s; if(s.a>1||s.a<0) s.s*=-1;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=s.col+','+s.a+')'; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  window.addEventListener('resize',()=>{c.width=window.innerWidth;c.height=window.innerHeight;});
+}
+
+// Floating particles
+function initParticles() {
+  const cols=['rgba(255,184,0,0.5)','rgba(0,212,255,0.4)','rgba(123,47,190,0.4)'];
+  for(let i=0;i<12;i++){
+    const p=document.createElement('div'); p.className='particle';
+    const sz=Math.random()*2.5+0.5;
+    p.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;
+      background:${cols[Math.floor(Math.random()*cols.length)]};
+      animation-duration:${10+Math.random()*15}s;animation-delay:${Math.random()*12}s;`;
+    document.body.appendChild(p);
+  }
+}
+
+// ==================== SOUND SYSTEM ====================
+const AC = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+let soundOn = true;
+
+function getAC() {
+  if (!audioCtx) { try { audioCtx = new AC(); } catch(e){} }
+  return audioCtx;
+}
+
+function playTone(freq, type='sine', dur=0.12, vol=0.18, delay=0) {
+  if (!soundOn) return;
+  const ac = getAC(); if (!ac) return;
+  try {
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.connect(gain); gain.connect(ac.destination);
+    osc.type = type; osc.frequency.setValueAtTime(freq, ac.currentTime + delay);
+    gain.gain.setValueAtTime(0, ac.currentTime + delay);
+    gain.gain.linearRampToValueAtTime(vol, ac.currentTime + delay + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + delay + dur);
+    osc.start(ac.currentTime + delay);
+    osc.stop(ac.currentTime + delay + dur + 0.05);
+  } catch(e) {}
+}
+
+function soundBuy() {
+  playTone(440, 'sine', 0.08, 0.15);
+  playTone(660, 'sine', 0.08, 0.12, 0.06);
+}
+function soundTap() { playTone(330, 'sine', 0.06, 0.1); }
+function soundPrestige() {
+  [220,330,440,550,660,880].forEach((f,i) => playTone(f,'sine',0.18,0.12,i*0.07));
+}
+function soundChest() {
+  [330,440,550,660,880,1100].forEach((f,i) => playTone(f,'triangle',0.15,0.15,i*0.06));
+}
+function soundDeal() {
+  playTone(550,'sawtooth',0.08,0.1);
+  playTone(440,'sine',0.1,0.12,0.06);
+}
+function soundMilestone() {
+  [440,554,659,880].forEach((f,i) => playTone(f,'sine',0.25,0.15,i*0.08));
+}
+function soundAchievement() {
+  [660,880,1100].forEach((f,i) => playTone(f,'sine',0.15,0.13,i*0.1));
+}
+function soundEvent() {
+  playTone(220,'sawtooth',0.05,0.15);
+  playTone(440,'sine',0.1,0.15,0.05);
+  playTone(660,'sine',0.12,0.13,0.1);
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  document.getElementById('sound-toggle').textContent = soundOn ? '🔊' : '🔇';
+  if (soundOn) playTone(440,'sine',0.1,0.15);
+}
+
+// ==================== DAILY CHEST ====================
+const CHEST_REWARDS = [
+  {icon:'⚡',label:'ENERGIE',type:'energy',roll:()=>Math.floor((Math.random()*0.5+0.5)*10000)},
+  {icon:'💎',label:'KRISTALLE',type:'crystals',roll:()=>Math.floor((Math.random()*0.5+0.5)*500)},
+  {icon:'✦',label:'PRESTIGE-PP',type:'pp',roll:()=>Math.floor(Math.random()*3)+1},
+  {icon:'⚡⚡',label:'MEGA ENERGIE',type:'energy',roll:()=>Math.floor((Math.random()*0.5+0.5)*100000)},
+  {icon:'🌟',label:'BOOST 60s',type:'boost',roll:()=>3},
+];
+
+function isDailyChestAvailable() {
+  const last = localStorage.getItem('ge2_chest_date');
+  return last !== new Date().toDateString();
+}
+
+function openDailyChest() {
+  if (!isDailyChestAvailable()) return;
+  soundChest();
+  localStorage.setItem('ge2_chest_date', new Date().toDateString());
+  // Pick 3 random rewards
+  const picked = [];
+  const pool = [...CHEST_REWARDS].sort(() => Math.random()-0.5).slice(0,3);
+  pool.forEach(r => { const amt = r.roll(); picked.push({...r, amount: amt}); });
+  // Apply rewards
+  picked.forEach(r => {
+    if(r.type==='energy'){S.energy+=r.amount;S.totalEarned.energy+=r.amount;}
+    if(r.type==='crystals'){S.crystals+=r.amount;S.totalEarned.crystals+=r.amount;}
+    if(r.type==='pp') S.pp+=r.amount;
+    if(r.type==='boost'){S.eventActive=true;S.eventMult=r.amount;S.eventTimer=60;showEvent('🎁 CHEST BOOST!','×'+r.amount+' für 60 Sekunden',r.amount);}
+  });
+  // Show animation
+  const el = document.getElementById('chest-anim');
+  const rr = document.getElementById('chest-open-rewards');
+  rr.innerHTML = '';
+  picked.forEach((r,i) => {
+    const div = document.createElement('div');
+    div.className='chest-reward-item';
+    div.style.animationDelay=(i*0.15+0.3)+'s';
+    div.innerHTML=`<div class="chest-reward-val">${r.icon} ${fmt(r.amount)}</div><div class="chest-reward-label">${r.label}</div>`;
+    rr.appendChild(div);
+  });
+  el.style.display='flex';
+  spawnConfetti();
+  updateChestUI();
+  checkAchievements();
+}
+
+function closeChestAnim() {
+  document.getElementById('chest-anim').style.display='none';
+  updateHUD();
+}
+
+function updateChestUI() {
+  const avail = isDailyChestAvailable();
+  const card = document.getElementById('chest-card');
+  const timerEl = document.getElementById('chest-timer-text');
+  if(avail) {
+    card.classList.remove('claimed');
+    timerEl.textContent='';
+  } else {
+    card.classList.add('claimed');
+    const now = new Date();
+    const midnight = new Date(now); midnight.setHours(24,0,0,0);
+    const diff = Math.floor((midnight-now)/1000);
+    const h=Math.floor(diff/3600), m=Math.floor((diff%3600)/60), s=diff%60;
+    timerEl.textContent=`Nächste Truhe in ${h}h ${m}m ${s}s`;
+  }
+}
+
+function spawnConfetti() {
+  const colors=['#FFB800','#00D4FF','#7B2FBE','#4ADE80','#FF4500','#FF69B4'];
+  for(let i=0;i<60;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    el.style.cssText=`left:${Math.random()*100}vw;top:-20px;background:${colors[Math.floor(Math.random()*colors.length)]};
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      width:${Math.random()*8+4}px;height:${Math.random()*8+4}px;
+      animation-duration:${Math.random()*2+1.5}s;animation-delay:${Math.random()*0.5}s;z-index:8002;`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),3500);
+  }
+}
+
+// ==================== BLACK MARKET ====================
+const MARKET_DEALS_POOL = [
+  {icon:'⚡',name:'ENERGIE-DUMP',desc:'Tausche Kristalle in Energie',give:'crystals',giveAmt:200,get:'energy',getAmt:50000,badge:'DEAL'},
+  {icon:'💎',name:'KRISTALL-RAUSCH',desc:'Tausche Energie in Kristalle',give:'energy',giveAmt:30000,get:'crystals',getAmt:800,badge:'HOT'},
+  {icon:'✦',name:'PP-CONVERTER',desc:'Tausche Energie in Prestige-PP',give:'energy',giveAmt:100000,get:'pp',getAmt:3,badge:'SELTEN'},
+  {icon:'🌑',name:'DUNKLER TAUSCH',desc:'Energie für Dunkelmaterie',give:'energy',giveAmt:500000,get:'dark',getAmt:50,badge:'VOID'},
+  {icon:'💫',name:'KRISTALL-NOVA',desc:'Großer Kristallvorrat',give:'crystals',giveAmt:1000,get:'energy',getAmt:300000,badge:'MEGA'},
+  {icon:'⚜️',name:'PRESTIGE-HANDEL',desc:'Kristalle gegen Prestige-PP',give:'crystals',giveAmt:5000,get:'pp',getAmt:5,badge:'EPISCH'},
+  {icon:'🔥',name:'ENERGIE-INFERNO',desc:'Kleine Kristalle, viel Energie',give:'crystals',giveAmt:50,get:'energy',getAmt:5000,badge:'DEAL'},
+  {icon:'🌟',name:'STERNHANDEL',desc:'PP für massig Energie',give:'pp',giveAmt:1,get:'energy',getAmt:200000,badge:'RISIKO'},
+];
+
+let marketDeals = [];
+let marketRefreshTime = 0;
+
+function initMarket() {
+  const saved = localStorage.getItem('ge2_market');
+  const savedTime = parseInt(localStorage.getItem('ge2_market_time')||'0');
+  const now = Date.now();
+  if (saved && savedTime && now - savedTime < 3*3600*1000) {
+    marketDeals = JSON.parse(saved);
+    marketRefreshTime = savedTime + 3*3600*1000;
+  } else {
+    refreshMarket();
+  }
+}
+
+function refreshMarket() {
+  const shuffled = [...MARKET_DEALS_POOL].sort(()=>Math.random()-0.5);
+  marketDeals = shuffled.slice(0,3).map(d=>({...d,sold:false}));
+  marketRefreshTime = Date.now() + 3*3600*1000;
+  localStorage.setItem('ge2_market', JSON.stringify(marketDeals));
+  localStorage.setItem('ge2_market_time', Date.now().toString());
+  document.getElementById('market-notif').style.display='block';
+}
+
+function buyDeal(idx) {
+  const deal = marketDeals[idx];
+  if(!deal||deal.sold) return;
+  const cost={};
+  cost[deal.give]=deal.giveAmt;
+  if(!canAfford(cost)){showToast('❌ Zu wenige Ressourcen!');return;}
+  spend(cost);
+  if(deal.get==='energy'){S.energy+=deal.getAmt;S.totalEarned.energy+=deal.getAmt;}
+  if(deal.get==='crystals'){S.crystals+=deal.getAmt;S.totalEarned.crystals+=deal.getAmt;}
+  if(deal.get==='pp') S.pp+=deal.getAmt;
+  if(deal.get==='dark'){S.dark+=deal.getAmt;}
+  deal.sold=true;
+  soundDeal();
+  spawnFloatNum('+'+fmt(deal.getAmt)+' '+{energy:'⚡',crystals:'💎',pp:'PP',dark:'🌑'}[deal.get],'green');
+  showToast('🏪 Deal abgeschlossen: '+deal.name);
+  localStorage.setItem('ge2_market',JSON.stringify(marketDeals));
+  renderMarket();
+  updateHUD();
+}
+
+function renderMarket() {
+  const el = document.getElementById('market-deals');
+  if(!el) return;
+  el.innerHTML = marketDeals.map((d,i)=>{
+    const resLabels={energy:'⚡ Energie',crystals:'💎 Kristalle',pp:'✦ PP',dark:'🌑 Dunkelm.'};
+    return `<div class="market-deal ${d.sold?'deal-sold':''}">
+      <div class="deal-badge">${d.badge}</div>
+      <div class="deal-row">
+        <div class="deal-icon">${d.icon}</div>
+        <div class="deal-info">
+          <div class="deal-name">${d.name}</div>
+          <div class="deal-desc">${d.desc}</div>
+        </div>
+      </div>
+      <div class="deal-price-row">
+        <div><div class="deal-give">Kostet: ${resLabels[d.give]} ${fmt(d.giveAmt)}</div>
+        <div class="deal-get">Erhalte: ${resLabels[d.get]} ${fmt(d.getAmt)}</div></div>
+        <button class="deal-cost-btn" onclick="buyDeal(${i})" ${d.sold?'disabled':''}>
+          ${d.sold?'✓ GEKAUFT':'KAUFEN'}
+        </button>
+      </div>
+      <div class="market-timer-bar"><div class="market-timer-fill" id="market-fill-${i}" style="width:100%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function updateMarketTimer() {
+  const el = document.getElementById('market-timer');
+  if(!el) return;
+  const now = Date.now();
+  if(now >= marketRefreshTime) { refreshMarket(); renderMarket(); return; }
+  const diff = Math.floor((marketRefreshTime-now)/1000);
+  const h=Math.floor(diff/3600), m=Math.floor((diff%3600)/60), s=diff%60;
+  el.textContent=`${h}h ${m.toString().padStart(2,'0')}m ${s.toString().padStart(2,'0')}s`;
+  const pct = ((marketRefreshTime-now)/(3*3600*1000))*100;
+  marketDeals.forEach((_,i)=>{
+    const f=document.getElementById('market-fill-'+i);
+    if(f) f.style.width=pct+'%';
+  });
+}
+
+// ==================== MILESTONE CELEBRATIONS ====================
+const MILESTONES_ENERGY = [1000,10000,100000,1e6,1e9,1e12];
+const MILESTONES_CRYSTALS = [100,1000,10000,100000,1e6];
+let _lastMilE=0, _lastMilC=0;
+
+function checkMilestones() {
+  // Energy milestones
+  const eIdx = MILESTONES_ENERGY.findIndex(m=>S.totalEarned.energy>=m&&m>_lastMilE);
+  if(eIdx>=0) {
+    _lastMilE=MILESTONES_ENERGY[eIdx];
+    showMilestoneCelebration('⚡',fmt(_lastMilE)+' Energie','ENERGIE-MEILENSTEIN');
+    soundMilestone(); spawnConfetti();
+  }
+  // Crystal milestones
+  const cIdx = MILESTONES_CRYSTALS.findIndex(m=>S.totalEarned.crystals>=m&&m>_lastMilC);
+  if(cIdx>=0) {
+    _lastMilC=MILESTONES_CRYSTALS[cIdx];
+    showMilestoneCelebration('💎',fmt(_lastMilC)+' Kristalle','KRISTALL-MEILENSTEIN');
+    soundMilestone();
+  }
+}
+
+function showMilestoneCelebration(icon, num, title) {
+  document.getElementById('mil-icon').textContent=icon;
+  document.getElementById('mil-num').textContent=num;
+  document.getElementById('mil-title').textContent=title;
+  const el=document.getElementById('milestone-cel');
+  el.style.display='flex';
+  setTimeout(()=>el.style.display='none',3000);
+}
+
+// ==================== GAME LOOP ====================
+function tick() {
+  const now=Date.now(), delta=(now-S.lastTick)/1000;
+  S.lastTick=now;
+  const p=getProduction();
+  const e=p.energy*delta, cr=p.crystals*delta, dk=p.dark*delta;
+  S.energy+=e; S.crystals+=cr; S.dark+=dk;
+  S.totalEarned.energy+=e; S.totalEarned.crystals+=cr; S.totalEarned.dark+=dk;
+
+  // Event timer
+  if(S.eventActive) {
+    S.eventTimer-=delta;
+    document.getElementById('event-timer').textContent=Math.ceil(Math.max(0,S.eventTimer));
+    if(S.eventTimer<=0){
+      S.eventActive=false; S.eventMult=1;
+      document.getElementById('event-popup').classList.remove('show');
+    }
+  }
+  // Special timer
+  if(S.specialActive) {
+    S.specialTimer-=delta;
+    document.getElementById('special-countdown').textContent=Math.ceil(Math.max(0,S.specialTimer));
+    if(S.specialTimer<=0){
+      S.specialActive=false; S._currentSpecial=null;
+      document.getElementById('special-overlay').style.display='none';
+    }
+  }
+
+  maybeSpawnEvent();
+  maybeSpawnSpecial();
+  checkMissions();
+  checkMilestones();
+  updateMarketTimer();
+  updateChestUI();
+  updateHUD();
+}
+
+// ==================== INIT ====================
+const lastSave=loadGame();
+initCanvas();
+initParticles();
+initMissions();
+initMarket();
+checkOffline(lastSave);
+render();
+document.getElementById('sound-toggle').style.display='flex';
+
+setInterval(tick, 50);
+setInterval(()=>renderBuildings(), 2000);
+setInterval(()=>saveGame(), 10000);
+setInterval(()=>checkAchievements(), 5000);
+</script>
+</body>
+</html>
