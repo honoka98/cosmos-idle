@@ -131,22 +131,65 @@ header{background:linear-gradient(180deg,rgba(10,14,26,0.98),rgba(10,14,26,0.92)
 .level-bar-bg{height:3px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;}
 .level-bar-fill{height:100%;border-radius:3px;transition:width 0.4s ease;}
 
+/* BUY MODE TOGGLE */
+.buy-mode-bar{display:flex;gap:6px;padding:0 14px 10px;align-items:center;}
+.buy-mode-label{font-size:9px;color:var(--text-dim);letter-spacing:1px;margin-right:2px;flex-shrink:0;}
+.buy-mode-btn{flex:1;padding:7px 4px;border-radius:9px;border:1px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.04);font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;
+  color:var(--text-dim);cursor:pointer;letter-spacing:0.5px;transition:all 0.15s;text-align:center;}
+.buy-mode-btn.active{background:linear-gradient(135deg,rgba(255,184,0,0.25),rgba(255,184,0,0.12));
+  border-color:rgba(255,184,0,0.6);color:var(--gold);
+  box-shadow:0 0 12px rgba(255,184,0,0.2);}
+.buy-mode-btn:hover:not(.active){background:rgba(255,255,255,0.08);color:var(--text);}
+
+/* BUY BUTTON MODE LABEL */
+.buy-btn .btn-mode{font-size:8px;letter-spacing:1px;opacity:0.7;display:block;margin-bottom:1px;}
+
 /* BUY ROW */
-.buy-row{display:flex;gap:6px;margin-top:8px;}
-.buy-btn{flex:1;background:linear-gradient(135deg,rgba(255,184,0,0.12),rgba(255,184,0,0.06));
-  border:1px solid rgba(255,184,0,0.35);border-radius:9px;padding:8px 10px;
-  display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all 0.15s;
-  font-family:'Rajdhani',sans-serif;color:var(--gold);}
-.buy-btn:hover:not(:disabled){background:linear-gradient(135deg,rgba(255,184,0,0.22),rgba(255,184,0,0.12));
-  box-shadow:0 0 18px rgba(255,184,0,0.2);transform:translateY(-1px);}
-.buy-btn:disabled{opacity:0.35;cursor:not-allowed;border-color:rgba(255,255,255,0.08);color:var(--text-dim);
-  background:rgba(255,255,255,0.02);}
-.buy-btn .btn-label{font-size:11px;font-weight:700;letter-spacing:1px;}
-.buy-btn .btn-cost{font-family:'Share Tech Mono',monospace;font-size:11px;}
-.tap-btn{width:40px;height:40px;background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(0,212,255,0.06));
-  border:1px solid rgba(0,212,255,0.3);border-radius:9px;display:flex;align-items:center;justify-content:center;
-  font-size:16px;cursor:pointer;transition:all 0.1s;flex-shrink:0;}
-.tap-btn:active{transform:scale(0.9);box-shadow:0 0 20px rgba(0,212,255,0.4);}
+.buy-row{display:flex;flex-direction:row;align-items:center;gap:6px;margin-top:8px;}
+.buy-btn{
+  flex:1;
+  background:linear-gradient(135deg,rgba(255,184,0,0.18),rgba(255,184,0,0.08));
+  border:1px solid rgba(255,184,0,0.45);
+  border-radius:10px;
+  padding:9px 12px;
+  display:flex;flex-direction:row;
+  align-items:center;justify-content:space-between;
+  cursor:pointer;transition:all 0.15s;
+  font-family:'Rajdhani',sans-serif;color:var(--gold);
+  min-height:42px;
+}
+.buy-btn:hover:not(:disabled){
+  background:linear-gradient(135deg,rgba(255,184,0,0.28),rgba(255,184,0,0.15));
+  box-shadow:0 0 18px rgba(255,184,0,0.25);transform:translateY(-1px);
+}
+.buy-btn:disabled{
+  opacity:0.35;cursor:not-allowed;
+  border-color:rgba(255,255,255,0.1);
+  color:var(--text-dim);
+  background:rgba(255,255,255,0.03);
+}
+.buy-btn .btn-label{
+  display:flex;flex-direction:column;align-items:flex-start;gap:0;
+  font-size:13px;font-weight:700;letter-spacing:1px;line-height:1;
+}
+.buy-btn .btn-mode{
+  font-size:8px;letter-spacing:1px;opacity:0.65;
+  font-family:'Share Tech Mono',monospace;color:var(--gold);
+  margin-bottom:2px;display:block;
+}
+.buy-btn .btn-cost{
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px;font-weight:700;
+}
+.tap-btn{
+  width:42px;height:42px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(0,212,255,0.06));
+  border:1px solid rgba(0,212,255,0.3);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;cursor:pointer;transition:all 0.1s;
+}
+.tap-btn:active{transform:scale(0.88);box-shadow:0 0 20px rgba(0,212,255,0.4);}
 
 /* SYNERGY BADGE */
 .synergy-badge{display:inline-block;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);
@@ -224,6 +267,7 @@ header{background:linear-gradient(180deg,rgba(10,14,26,0.98),rgba(10,14,26,0.92)
 .tier-1{background:rgba(255,184,0,0.2);color:var(--gold);}
 .tier-2{background:rgba(123,47,190,0.3);color:var(--purple2);}
 .tier-3{background:rgba(255,69,0,0.3);color:var(--orange);}
+.tier-4{background:rgba(255,0,200,0.3);color:#FF44FF;}
 
 /* GALAXY MAP */
 .galaxy-map{padding:0 14px;}
@@ -780,6 +824,14 @@ body.skin-retro{
   <div class="tab-content active" id="tab-buildings">
     <div id="seasonal-banner-wrap"></div>
     <div class="section-header"><div class="section-title">🏗 GEBÄUDE</div><div class="section-line"></div></div>
+    <div class="buy-mode-bar">
+      <div class="buy-mode-label">KAUFEN:</div>
+      <button class="buy-mode-btn active" id="bm-1" onclick="setBuyMode(1)">×1</button>
+      <button class="buy-mode-btn" id="bm-5" onclick="setBuyMode(5)">×5</button>
+      <button class="buy-mode-btn" id="bm-10" onclick="setBuyMode(10)">×10</button>
+      <button class="buy-mode-btn" id="bm-25" onclick="setBuyMode(25)">×25</button>
+      <button class="buy-mode-btn" id="bm-max" onclick="setBuyMode('max')">MAX</button>
+    </div>
     <div class="buildings-grid" id="buildings-grid"></div>
   </div>
 
@@ -898,53 +950,108 @@ body.skin-retro{
 // ==================== GAME DATA ====================
 
 const BUILDINGS = [
-  {id:'solar',name:'SOLARKOLLEKTOR',icon:'☀️',desc:'Wandelt Sternenlicht in pure Energie.',
-   grad:'linear-gradient(180deg,#FFB800,#FF6B00)',baseCost:{energy:10},prod:{energy:0.5},
-   milestones:[{n:10,bonus:'×2 Energie'},{n:25,bonus:'×3 Energie'},{n:50,bonus:'×5 Energie'}]},
-  {id:'mine',name:'KRISTALLMINE',icon:'💎',desc:'Fördert Kristalle aus Asteroidengürteln.',
-   grad:'linear-gradient(180deg,#00D4FF,#0055FF)',baseCost:{energy:80},prod:{crystals:0.1},
-   milestones:[{n:10,bonus:'+1💎/s'},{n:25,bonus:'×2 Kristall'},{n:50,bonus:'×4 Kristall'}]},
-  {id:'reactor',name:'FUSIONSREAKTOR',icon:'⚛️',desc:'Fusioniert Materie zu Plasma-Energie.',
-   grad:'linear-gradient(180deg,#FF4500,#FF0080)',baseCost:{energy:350},prod:{energy:5},
-   milestones:[{n:10,bonus:'×2 Energie'},{n:25,bonus:'Synergie +'},{n:50,bonus:'×6 Energie'}]},
-  {id:'lab',name:'QUANTUMLABOR',icon:'🔬',desc:'Erforscht interdimensionale Synthese.',
-   grad:'linear-gradient(180deg,#7B2FBE,#00D4FF)',baseCost:{crystals:5},prod:{crystals:0.8},
-   milestones:[{n:10,bonus:'×2 Kristall'},{n:25,bonus:'+Forschung'},{n:50,bonus:'×5 Kristall'}]},
-  {id:'station',name:'RAUMSTATION',icon:'🛸',desc:'Koordiniert das galaktische Handelsnetz.',
-   grad:'linear-gradient(180deg,#4ADE80,#00D4FF)',baseCost:{energy:2000,crystals:25},prod:{energy:20,crystals:2},
-   milestones:[{n:10,bonus:'Dual Boost'},{n:25,bonus:'×3 Alles'},{n:50,bonus:'×8 Alles'}]},
-  {id:'dyson',name:'DYSON-SPHÄRE',icon:'🌟',desc:'Umhüllt Sterne und erntet ihre Energie.',
-   grad:'linear-gradient(180deg,#FFB800,#FF4500)',baseCost:{energy:15000,crystals:200},prod:{energy:150,crystals:10},
-   milestones:[{n:10,bonus:'×3 Energie'},{n:25,bonus:'Dark Matter'},{n:50,bonus:'GOD MODE'}]},
-  {id:'void_gate',name:'VOID-PORTAL',icon:'🌀',desc:'Öffnet Tore zur Dunkelmaterie-Dimension.',
-   grad:'linear-gradient(180deg,#1a0a2e,#7B2FBE)',baseCost:{energy:100000,crystals:2000},prod:{energy:1000,crystals:100,dark:1},
-   milestones:[{n:5,bonus:'Void ×2'},{n:10,bonus:'Void ×5'},{n:25,bonus:'ASCENSION'}],
+  // TIER 1 — Starter
+  {id:'solar',name:'SOLARKOLLEKTOR',icon:'☀️',desc:'Wandelt Sternenlicht in pure Energie. Dein erster Schritt zum Galaktischen Imperium.',
+   grad:'linear-gradient(180deg,#FFB800,#FF6B00)',baseCost:{energy:10},prod:{energy:0.5},maxLevel:200,
+   milestones:[{n:10,bonus:'×2 Energie'},{n:25,bonus:'×3 Energie'},{n:50,bonus:'×5 Energie'},{n:100,bonus:'×8 Energie'},{n:200,bonus:'×15 Energie'}]},
+  {id:'wind',name:'IONENTURM',icon:'🌪️',desc:'Bündelt Ionenströme zu nutzbarer Energie. Effizient und wartungsarm.',
+   grad:'linear-gradient(180deg,#00D4FF,#0077FF)',baseCost:{energy:50},prod:{energy:1.5},maxLevel:200,
+   milestones:[{n:10,bonus:'×2'},{n:25,bonus:'×3'},{n:50,bonus:'×5'},{n:100,bonus:'×9'},{n:200,bonus:'×18'}]},
+  {id:'mine',name:'KRISTALLMINE',icon:'💎',desc:'Fördert Kristalle aus Asteroidengürteln. Grundlage jeder fortgeschrittenen Forschung.',
+   grad:'linear-gradient(180deg,#44AAFF,#0033CC)',baseCost:{energy:80},prod:{crystals:0.1},maxLevel:200,
+   milestones:[{n:10,bonus:'×2 Kristall'},{n:25,bonus:'×3 Kristall'},{n:50,bonus:'×6 Kristall'},{n:100,bonus:'×10 Kristall'},{n:200,bonus:'×20 Kristall'}]},
+  // TIER 2 — Advanced
+  {id:'reactor',name:'FUSIONSREAKTOR',icon:'⚛️',desc:'Fusioniert Materie zu gewaltigem Plasma. Zehnmal effizienter als ein Solarkollektor.',
+   grad:'linear-gradient(180deg,#FF4500,#FF0080)',baseCost:{energy:350},prod:{energy:5},maxLevel:200,
+   milestones:[{n:10,bonus:'×2'},{n:25,bonus:'×4 + Synergie'},{n:50,bonus:'×7'},{n:100,bonus:'×12'},{n:200,bonus:'×22'}]},
+  {id:'lab',name:'QUANTUMLABOR',icon:'🔬',desc:'Erforscht interdimensionale Kristallsynthese. Schlüssel zu allen Prestige-Upgrades.',
+   grad:'linear-gradient(180deg,#7B2FBE,#00D4FF)',baseCost:{crystals:5},prod:{crystals:0.8},maxLevel:200,
+   milestones:[{n:10,bonus:'×2 Kristall'},{n:25,bonus:'×4 Kristall'},{n:50,bonus:'×7 Kristall'},{n:100,bonus:'×12 Kristall'},{n:200,bonus:'×25 Kristall'}]},
+  {id:'plasma',name:'PLASMAGENERATOR',icon:'🔵',desc:'Wandelt kosmische Strahlung direkt in Energie. Enormer Schub im Mid-Game.',
+   grad:'linear-gradient(180deg,#0099FF,#00FFDD)',baseCost:{energy:1200,crystals:10},prod:{energy:15,crystals:0.5},maxLevel:200,
+   milestones:[{n:10,bonus:'Dual ×2'},{n:25,bonus:'Dual ×4'},{n:50,bonus:'Dual ×7'},{n:100,bonus:'Dual ×12'},{n:200,bonus:'Dual ×20'}]},
+  // TIER 3 — Space Age
+  {id:'station',name:'RAUMSTATION',icon:'🛸',desc:'Koordiniert das galaktische Handelsnetz. Produziert Energie UND Kristalle.',
+   grad:'linear-gradient(180deg,#4ADE80,#00D4FF)',baseCost:{energy:2000,crystals:25},prod:{energy:20,crystals:2},maxLevel:200,
+   milestones:[{n:10,bonus:'Dual ×2'},{n:25,bonus:'Dual ×4'},{n:50,bonus:'Dual ×8'},{n:100,bonus:'Dual ×14'},{n:200,bonus:'Dual ×25'}]},
+  {id:'pulsar',name:'PULSAR-ANTENNE',icon:'📡',desc:'Fängt Signale sterbender Sterne ein und wandelt sie in pure Macht um.',
+   grad:'linear-gradient(180deg,#FF00AA,#7B2FBE)',baseCost:{energy:8000,crystals:80},prod:{energy:80,crystals:5},maxLevel:200,
+   milestones:[{n:10,bonus:'×3'},{n:25,bonus:'×5'},{n:50,bonus:'×9'},{n:100,bonus:'×16'},{n:200,bonus:'×30'}]},
+  {id:'dyson',name:'DYSON-SPHÄRE',icon:'🌟',desc:'Umhüllt Sterne und erntet ihre totale Energie. Mächtigstes konventionelles Gebäude.',
+   grad:'linear-gradient(180deg,#FFB800,#FF4500)',baseCost:{energy:15000,crystals:200},prod:{energy:150,crystals:10},maxLevel:200,
+   milestones:[{n:10,bonus:'×3 Energie'},{n:25,bonus:'×5 + Dark'},{n:50,bonus:'×10'},{n:100,bonus:'×18'},{n:200,bonus:'×35'}]},
+  // TIER 4 — Endgame
+  {id:'blackstar',name:'SCHWARZSTERN',icon:'⚫',desc:'Kontrolliert ein künstliches Schwarzes Loch. Gravitationsenergie ohne Grenzen.',
+   grad:'linear-gradient(180deg,#111,#4B0082)',baseCost:{energy:80000,crystals:1000},prod:{energy:800,crystals:60,dark:0.5},maxLevel:200,
+   milestones:[{n:5,bonus:'×3 Alles'},{n:10,bonus:'×6 Alles'},{n:25,bonus:'×12 Alles'},{n:50,bonus:'×20 Alles'},{n:100,bonus:'×40 Alles'}],
+   requiresPrestige:2},
+  {id:'void_gate',name:'VOID-PORTAL',icon:'🌀',desc:'Öffnet Tore zur Dunkelmaterie-Dimension. Nur für die mutigsten Commander.',
+   grad:'linear-gradient(180deg,#1a0a2e,#7B2FBE)',baseCost:{energy:100000,crystals:2000},prod:{energy:1000,crystals:100,dark:1},maxLevel:200,
+   milestones:[{n:5,bonus:'Void ×3'},{n:10,bonus:'Void ×6'},{n:25,bonus:'Void ×12'},{n:50,bonus:'ASCENSION'},{n:100,bonus:'GOD TIER'}],
    requiresPrestige:3},
+  {id:'singularity',name:'SINGULARITÄT',icon:'🌌',desc:'Die ultimative Energiequelle. Verschmilzt Raum und Zeit zu reiner Macht.',
+   grad:'linear-gradient(180deg,#000,#FF00FF)',baseCost:{energy:1000000,crystals:20000},prod:{energy:10000,crystals:1000,dark:10},maxLevel:200,
+   milestones:[{n:1,bonus:'×5 Alles'},{n:5,bonus:'×15 Alles'},{n:10,bonus:'×30 Alles'},{n:25,bonus:'OMNIPOTENT'},{n:50,bonus:'GÖTTLICH'}],
+   requiresPrestige:5},
 ];
 
 const PRESTIGE_UPGRADES = [
+  // TIER 1 — Basic (1-3 PP)
   {id:'eu1',name:'QUANTENBOOST',icon:'⚡',desc:'+50% Energieproduktion permanent',cost:1,tier:1,effect:'eMult',val:0.5},
   {id:'cu1',name:'KRISTALLFELD',icon:'💎',desc:'+50% Kristallproduktion',cost:1,tier:1,effect:'cMult',val:0.5},
+  {id:'tap1',name:'TAP-MEISTER',icon:'👆',desc:'Klick-Produktion ×5',cost:1,tier:1,effect:'tapMult',val:4.0},
   {id:'cr1',name:'TEMPORALFELD',icon:'⏳',desc:'Gebäude kosten 20% weniger',cost:2,tier:1,effect:'costRed',val:0.8},
+  {id:'eu2',name:'SOLAR-VERSTÄRKER',icon:'☀️',desc:'+80% Energieproduktion',cost:2,tier:1,effect:'eMult',val:0.8},
+  {id:'cu2',name:'KRISTALLSTURM',icon:'🌪️',desc:'+80% Kristallproduktion',cost:2,tier:1,effect:'cMult',val:0.8},
+  // TIER 2 — Advanced (3-8 PP)
   {id:'gm1',name:'NEURONALNETZ',icon:'🧠',desc:'+100% gesamte Produktion',cost:3,tier:2,effect:'gMult',val:1.0},
-  {id:'eu2',name:'DUNKLE MATERIE',icon:'🌑',desc:'+200% Energieproduktion',cost:5,tier:2,effect:'eMult',val:2.0},
-  {id:'cu2',name:'KRISTALLSTURM',icon:'🌪️',desc:'+200% Kristallproduktion',cost:5,tier:2,effect:'cMult',val:2.0},
-  {id:'gm2',name:'ZEITDILATATION',icon:'🌀',desc:'Produktion ×3 permanent',cost:8,tier:2,effect:'gMult',val:2.0},
-  {id:'cr2',name:'VOID-EFFIZIENZ',icon:'🔮',desc:'Kosten 40% günstiger',cost:6,tier:2,effect:'costRed',val:0.6},
-  {id:'eu3',name:'STERNENKERN',icon:'💫',desc:'+500% Energieproduktion',cost:12,tier:3,effect:'eMult',val:5.0},
-  {id:'gm3',name:'GÖTTLICHER WILLE',icon:'⚜️',desc:'Gesamtproduktion ×5',cost:20,tier:3,effect:'gMult',val:4.0},
-  {id:'dm1',name:'DUNKLE SYNTHESE',icon:'🌑',desc:'Ermöglicht Dunkelmaterie',cost:10,tier:3,effect:'darkUnlock',val:1},
-  {id:'tap1',name:'TAP-MEISTER',icon:'👆',desc:'Klick-Produktion ×5',cost:3,tier:1,effect:'tapMult',val:4.0},
+  {id:'cr2',name:'RAUMFALTEN',icon:'🌌',desc:'Kosten 35% günstiger',cost:4,tier:2,effect:'costRed',val:0.65},
+  {id:'eu3',name:'PLASMA-INFUSION',icon:'🔵',desc:'+150% Energieproduktion',cost:5,tier:2,effect:'eMult',val:1.5},
+  {id:'cu3',name:'KRISTALL-NOVA',icon:'💎',desc:'+150% Kristallproduktion',cost:5,tier:2,effect:'cMult',val:1.5},
+  {id:'gm2',name:'ZEITDILATATION',icon:'🌀',desc:'Produktion ×3 permanent',cost:6,tier:2,effect:'gMult',val:2.0},
+  {id:'off1',name:'OFFLINE-BOOST',icon:'🌙',desc:'Offline-Produktion ×2 (max 16h)',cost:4,tier:2,effect:'offlineMult',val:2.0},
+  {id:'tap2',name:'TAP-GOTT',icon:'✋',desc:'Klick-Produktion ×20',cost:5,tier:2,effect:'tapMult',val:19.0},
+  {id:'ms1',name:'MILESTONE-BOOST',icon:'🏅',desc:'Milestone-Boni verdoppelt',cost:6,tier:2,effect:'milestoneMult',val:2.0},
+  // TIER 3 — Powerful (8-20 PP)
+  {id:'dm1',name:'DUNKLE SYNTHESE',icon:'🌑',desc:'Ermöglicht Dunkelmaterie-Produktion',cost:8,tier:3,effect:'darkUnlock',val:1},
+  {id:'eu4',name:'STERNENKERN',icon:'💫',desc:'+500% Energieproduktion',cost:10,tier:3,effect:'eMult',val:5.0},
+  {id:'cu4',name:'KRISTALL-TITAN',icon:'🏔️',desc:'+500% Kristallproduktion',cost:10,tier:3,effect:'cMult',val:5.0},
+  {id:'cr3',name:'VOID-EFFIZIENZ',icon:'🔮',desc:'Kosten 50% günstiger',cost:10,tier:3,effect:'costRed',val:0.5},
+  {id:'gm3',name:'GÖTTLICHER WILLE',icon:'⚜️',desc:'Gesamtproduktion ×5',cost:15,tier:3,effect:'gMult',val:4.0},
+  {id:'start1',name:'STARTER-PAKET',icon:'🎁',desc:'Starte mit 500 Energie nach Prestige',cost:8,tier:3,effect:'startBonus',val:500},
+  // TIER 4 — Godlike (20+ PP)
+  {id:'gm4',name:'OMNIPOTENZ',icon:'🌠',desc:'Gesamtproduktion ×10',cost:25,tier:4,effect:'gMult',val:9.0},
+  {id:'eu5',name:'KOSMISCHES FEUER',icon:'🔥',desc:'+1000% Energieproduktion',cost:30,tier:4,effect:'eMult',val:10.0},
+  {id:'dm2',name:'VOID-BEHERRSCHUNG',icon:'🌑',desc:'Dunkelmaterie ×5 + als Währung',cost:35,tier:4,effect:'dMult',val:4.0},
+  {id:'gm5',name:'ABSOLUTE MACHT',icon:'👑',desc:'ALLE Produktion ×20 — Endgame',cost:50,tier:4,effect:'gMult',val:19.0},
 ];
 
 const RESEARCH = [
-  {id:'r1',name:'QUANTENMECHANIK',icon:'⚛️',desc:'+20% Energieproduktion',cost:{crystals:50},effect:'eMult',val:0.2,req:[]},
-  {id:'r2',name:'KRISTALLOGRAPHIE',icon:'💎',desc:'+30% Kristallproduktion',cost:{crystals:120},effect:'cMult',val:0.3,req:['r1']},
-  {id:'r3',name:'FUSIONSKONTROLLE',icon:'🔥',desc:'Reaktoren produzieren ×1.5',cost:{crystals:200},effect:'buildingMult',building:'reactor',val:0.5,req:['r1']},
-  {id:'r4',name:'RAUMFALTUNG',icon:'🌌',desc:'Stationskosten -30%',cost:{crystals:350},effect:'costRed',val:0.3,req:['r2']},
-  {id:'r5',name:'TEMPORALMATRIX',icon:'⏰',desc:'+50% gesamte Produktion',cost:{crystals:600},effect:'gMult',val:0.5,req:['r2','r3']},
-  {id:'r6',name:'DUNKLE PHYSIK',icon:'🌑',desc:'Dunkelmaterie ×2',cost:{crystals:1500},effect:'dMult',val:1.0,req:['r4','r5']},
-  {id:'r7',name:'ASCENSION CODE',icon:'💻',desc:'Alle Produktion ×2',cost:{crystals:5000},effect:'gMult',val:1.0,req:['r6']},
+  // BRANCH 1: Energie
+  {id:'r1',name:'QUANTENMECHANIK',icon:'⚛️',desc:'+25% Energieproduktion',cost:{crystals:50},effect:'eMult',val:0.25,req:[],tier:1},
+  {id:'r2',name:'PLASMAPHYSIK',icon:'🔵',desc:'+40% Energieproduktion',cost:{crystals:150},effect:'eMult',val:0.4,req:['r1'],tier:1},
+  {id:'r3',name:'FUSIONSKONTROLLE',icon:'🔥',desc:'Reaktoren produzieren ×2',cost:{crystals:300},effect:'eMult',val:1.0,req:['r2'],tier:2},
+  {id:'r4',name:'ANTIMATERIEANTRIEB',icon:'💥',desc:'+100% Energieproduktion',cost:{crystals:800},effect:'eMult',val:1.0,req:['r3'],tier:2},
+  {id:'r5',name:'STERNENENTZUG',icon:'⭐',desc:'+200% Energieproduktion',cost:{crystals:3000},effect:'eMult',val:2.0,req:['r4'],tier:3},
+  {id:'r6',name:'HYPERRAUM-ENERGIE',icon:'🌠',desc:'Energieproduktion ×5',cost:{crystals:12000},effect:'eMult',val:4.0,req:['r5'],tier:4},
+  // BRANCH 2: Kristalle
+  {id:'r7',name:'KRISTALLOGRAPHIE',icon:'💎',desc:'+35% Kristallproduktion',cost:{crystals:120},effect:'cMult',val:0.35,req:['r1'],tier:1},
+  {id:'r8',name:'MOLEKULARSYNTHESE',icon:'🧪',desc:'+60% Kristallproduktion',cost:{crystals:400},effect:'cMult',val:0.6,req:['r7'],tier:2},
+  {id:'r9',name:'QUANTENKRISTALL',icon:'🔷',desc:'+120% Kristallproduktion',cost:{crystals:1200},effect:'cMult',val:1.2,req:['r8'],tier:2},
+  {id:'r10',name:'KRISTALL-MATRIX',icon:'🏔️',desc:'Kristallproduktion ×4',cost:{crystals:5000},effect:'cMult',val:3.0,req:['r9'],tier:3},
+  // BRANCH 3: Effizienz
+  {id:'r11',name:'RAUMFALTUNG',icon:'🌌',desc:'Alle Kosten -25%',cost:{crystals:350},effect:'costRed',val:0.25,req:['r7'],tier:2},
+  {id:'r12',name:'TEMPORALMATRIX',icon:'⏰',desc:'+50% gesamte Produktion',cost:{crystals:700},effect:'gMult',val:0.5,req:['r11'],tier:2},
+  {id:'r13',name:'ZEITKOMPRESSION',icon:'⏳',desc:'Offline bis 24h (statt 8h)',cost:{crystals:2000},effect:'offlineTime',val:24,req:['r12'],tier:3},
+  {id:'r14',name:'KAUSALITÄTSBINDER',icon:'🔗',desc:'Alle Produktion ×2',cost:{crystals:6000},effect:'gMult',val:1.0,req:['r13'],tier:3},
+  // BRANCH 4: Dunkelmaterie
+  {id:'r15',name:'DUNKLE PHYSIK',icon:'🌑',desc:'Dunkelmaterie ×2',cost:{crystals:1500},effect:'dMult',val:1.0,req:['r9','r4'],tier:3},
+  {id:'r16',name:'VOID-RESONANZ',icon:'🌀',desc:'Dunkelmaterie ×5',cost:{crystals:8000},effect:'dMult',val:4.0,req:['r15'],tier:3},
+  {id:'r17',name:'SINGULARITÄTSFELD',icon:'⚫',desc:'Dunkelmaterie ×10 + Energie ×2',cost:{crystals:30000},effect:'dMult',val:9.0,req:['r16'],tier:4},
+  // BRANCH 5: Endgame
+  {id:'r18',name:'QUANTENÜBERGANG',icon:'💫',desc:'Alle Produktion ×3',cost:{crystals:15000},effect:'gMult',val:2.0,req:['r6','r10','r14'],tier:4},
+  {id:'r19',name:'ASCENSION CODE',icon:'💻',desc:'Alle Produktion ×5',cost:{crystals:50000},effect:'gMult',val:4.0,req:['r18'],tier:4},
+  {id:'r20',name:'KOSMISCHE WAHRHEIT',icon:'🌌',desc:'ALLE Produktion ×10 — Ultimativ',cost:{crystals:200000},effect:'gMult',val:9.0,req:['r19','r17'],tier:4},
 ];
 
 const GALAXY_ZONES = [
@@ -1085,11 +1192,12 @@ function getZoneBonus(type) {
 }
 function getStreakBonus() { return 1 + Math.min(S.streak,30)*0.01; }
 function getMilestoneMult(bId) {
+  const b = BUILDINGS.find(x=>x.id===bId); if(!b) return 1;
   const cnt = S.buildings[bId]||0;
   let mult=1;
-  if(cnt>=10) mult*=2;
-  if(cnt>=25) mult*=1.5;
-  if(cnt>=50) mult*=2;
+  b.milestones.forEach(m=>{ if(cnt>=m.n) mult*=2; });
+  // Prestige upgrade: milestone mult doubled
+  if(S.upgrades.has('ms1')) mult = 1 + (mult-1)*2;
   return mult;
 }
 function getSynergyBonus() {
@@ -1142,25 +1250,79 @@ function calcPP() {
   return Math.max(0, Math.floor(Math.sqrt(total/3) + S.totalPrestige)) * (chal?chal.multiplier:1);
 }
 
+// ==================== BUY MODE ====================
+let buyMode = 1; // 1, 5, 10, 25, 'max'
+
+function setBuyMode(mode) {
+  buyMode = mode;
+  ['1','5','10','25','max'].forEach(m => {
+    const el = document.getElementById('bm-'+m);
+    if(el) el.classList.toggle('active', String(buyMode)===String(m));
+  });
+  renderBuildings();
+}
+
+function getBuyAmount(b) {
+  if(buyMode === 'max') {
+    // Calculate max affordable
+    let n = 0, tempEnergy = S.energy, tempCrystals = S.crystals, tempDark = S.dark;
+    const cnt = S.buildings[b.id]||0;
+    const red = getCostRed();
+    while(n < 1000) {
+      const c = {};
+      for(const [r,base] of Object.entries(b.baseCost))
+        c[r] = Math.floor(base * Math.pow(1.15, cnt+n) * red);
+      if((c.energy||0) > tempEnergy || (c.crystals||0) > tempCrystals || (c.dark||0) > tempDark) break;
+      if(c.energy) tempEnergy -= c.energy;
+      if(c.crystals) tempCrystals -= c.crystals;
+      if(c.dark) tempDark -= c.dark;
+      n++;
+    }
+    return Math.max(1, n);
+  }
+  return buyMode;
+}
+
+function getBulkCost(b, amount) {
+  const cnt = S.buildings[b.id]||0;
+  const red = getCostRed();
+  const total = {};
+  for(let i=0; i<amount; i++) {
+    for(const [r,base] of Object.entries(b.baseCost)) {
+      const c = Math.floor(base * Math.pow(1.15, cnt+i) * red);
+      total[r] = (total[r]||0) + c;
+    }
+  }
+  return total;
+}
+
 // ==================== ACTIONS ====================
 function buyBuilding(id) {
   const b=BUILDINGS.find(x=>x.id===id);
   const chal=S.activeChallenge?CHALLENGES.find(c=>c.id===S.activeChallenge):null;
   if(chal&&chal.restriction===id){showToast('❌ Challenge: '+b.name+' gesperrt!');return;}
-  const cost=getBuildingCost(b);
-  if(!canAfford(cost)) return;
-  spend(cost);
-  S.buildings[id]=(S.buildings[id]||0)+1;
+  const amount = getBuyAmount(b);
+  const cost = getBulkCost(b, amount);
+  if(!canAfford(cost)){
+    // fallback: try buying 1
+    const cost1 = getBuildingCost(b);
+    if(!canAfford(cost1)) return;
+    spend(cost1);
+    S.buildings[id]=(S.buildings[id]||0)+1;
+    spawnFloatNum('+1 '+b.icon,'gold');
+    showToast(b.icon+' '+b.name+' ×1 gebaut!');
+  } else {
+    spend(cost);
+    S.buildings[id]=(S.buildings[id]||0)+amount;
+    spawnFloatNum('+'+amount+' '+b.icon,'gold');
+    showToast(b.icon+' '+b.name+(amount>1?' ×'+amount:'')+' gebaut!');
+  }
   // Mission tracking
   const m=S.missions.find(x=>x.type==='buy');
-  if(m&&!m.done) S.missionProgress[m.id]=(S.missionProgress[m.id]||0)+1;
-  // Boss check
+  if(m&&!m.done) S.missionProgress[m.id]=(S.missionProgress[m.id]||0)+amount;
   if(totalBuildings(S)%100===0 && totalBuildings(S)>0) spawnBoss();
-  // Achievement check
   checkAchievements();
-  spawnFloatNum('+1 '+b.icon, 'gold');
   soundBuy(); haptic('light');
-  showToast(b.icon+' '+b.name+' gebaut!');
   renderBuildings(); updateHUD();
 }
 
@@ -1185,6 +1347,8 @@ function doPrestige() {
   S.pp+=gain; S.totalPrestige++;
   BUILDINGS.forEach(b=>{ S.buildings[b.id]=0; });
   S.energy=0; S.crystals=0; S.dark=0;
+  // Apply start bonus upgrade
+  if(S.upgrades.has('start1')) S.energy = 500 * S.totalPrestige;
   S.activeChallenge=null;
   showCinematic(gain);
   checkAchievements();
@@ -1389,15 +1553,20 @@ function checkOffline(lastSave) {
   if(!lastSave) return;
   const offline=(Date.now()-lastSave)/1000;
   if(offline<60) return;
-  const maxOffline=8*3600;
+  // Check research offline time boost
+  let maxHours = 8;
+  if(S.researched.has('r13')) maxHours = 24;
+  if(S.upgrades.has('off1')) maxHours *= 2;
+  const maxOffline = maxHours * 3600;
   const actual=Math.min(offline,maxOffline);
   const prod=getProduction();
   const gained={energy:prod.energy*actual, crystals:prod.crystals*actual};
   if(gained.energy<1&&gained.crystals<1) return;
   document.getElementById('offline-energy').textContent=fmt(gained.energy);
   document.getElementById('offline-crystals').textContent=fmt(gained.crystals);
+  const mins = Math.floor(actual/60);
   document.getElementById('offline-desc').textContent=
-    'Du warst '+Math.floor(actual/60)+' Minuten weg. Dein Imperium hat gearbeitet!';
+    `Du warst ${mins>=60?Math.floor(mins/60)+'h '+(mins%60)+'m':mins+' Min.'} weg. Dein Imperium hat gearbeitet! (Max: ${maxHours}h)`;
   document.getElementById('offline-modal').style.display='flex';
   window._offlineGain=gained;
 }
@@ -1455,10 +1624,16 @@ function renderBuildings() {
   BUILDINGS.forEach(b=>{
     const cnt=S.buildings[b.id]||0;
     if(b.requiresPrestige && S.totalPrestige<b.requiresPrestige && cnt===0) return;
-    const cost=getBuildingCost(b);
-    const afford=canAfford(cost);
-    const prod=getProduction();
-    const costStr=Object.entries(cost).map(([r,v])=>`${r==='energy'?'⚡':r==='crystals'?'💎':'🌑'} ${fmt(v)}`).join(' + ');
+    const amount = getBuyAmount(b);
+    const bulkCost = getBulkCost(b, amount);
+    const bulkAfford = canAfford(bulkCost);
+    // Fallback to ×1 for affordability check display
+    const cost1 = getBuildingCost(b);
+    const afford1 = canAfford(cost1);
+    const displayCost = buyMode==='max'||amount>1 ? bulkCost : cost1;
+    const affordable = amount>1 ? bulkAfford : afford1;
+    const costStr=Object.entries(displayCost).map(([r,v])=>`${r==='energy'?'⚡':r==='crystals'?'💎':'🌑'} ${fmt(v)}`).join(' + ');
+    const modeLabel = buyMode==='max'?`MAX (×${amount})`:amount>1?`×${amount}`:'×1';
     const prodParts=[];
     const mm=getMilestoneMult(b.id);
     const em=getEff('eMult'), cm=getEff('cMult');
@@ -1470,7 +1645,7 @@ function renderBuildings() {
     const hasSynergy=(b.id==='reactor'&&(S.buildings.dyson||0)>=1);
 
     const card=document.createElement('div');
-    card.className=`building-card ${afford?'affordable':''} ${locked}`;
+    card.className=`building-card ${affordable||afford1?'affordable':''} ${locked}`;
     card.id='card-'+b.id;
     card.innerHTML=`
       <div class="card-accent" style="background:${b.grad}"></div>
@@ -1488,8 +1663,8 @@ function renderBuildings() {
       <div class="level-row"><span class="level-label">MILESTONE BONUS</span><span class="level-num">×${mm.toFixed(1)}</span></div>
       <div class="level-bar-bg"><div class="level-bar-fill" style="width:${Math.min((cnt/50)*100,100)}%;background:${b.grad}"></div></div>
       <div class="buy-row">
-        <button class="buy-btn" onclick="buyBuilding('${b.id}')" ${afford?'':'disabled'}>
-          <span class="btn-label">KAUFEN</span>
+        <button class="buy-btn" onclick="buyBuilding('${b.id}')" ${affordable||afford1?'':'disabled'}>
+          <span class="btn-label"><span class="btn-mode">${modeLabel}</span>KAUFEN</span>
           <span class="btn-cost">${costStr}</span>
         </button>
         <button class="tap-btn" onclick="tapBuilding('${b.id}',event)" title="Manuell produzieren">👆</button>
@@ -1555,23 +1730,39 @@ function renderGalaxy() {
 function renderResearch() {
   const el=document.getElementById('research-grid');
   el.innerHTML='';
-  RESEARCH.forEach(r=>{
-    const done=S.researched.has(r.id);
-    const reqMet=r.req.every(x=>S.researched.has(x));
-    const avail=!done&&reqMet;
-    const costStr=Object.entries(r.cost).map(([res,v])=>`💎 ${fmt(v)}`).join(', ');
-    const div=document.createElement('div');
-    div.className=`research-node ${done?'researched':avail?'available':''}`;
-    div.onclick=()=>doResearch(r.id);
-    div.innerHTML=`<div class="rn-icon">${r.icon}</div>
-      <div class="rn-info">
-        <div class="rn-name">${r.name}</div>
-        <div class="rn-desc">${r.desc}</div>
-        ${!done?`<div class="rn-cost">${costStr}</div>`:''} 
-        ${!reqMet&&!done?`<div style="font-size:9px;color:var(--text-dim);margin-top:2px">🔒 Vorherige Forschung benötigt</div>`:''}
-      </div>
-      <div class="rn-status">${done?'✅':avail?'🔬':'🔒'}</div>`;
-    el.appendChild(div);
+  const tierColors={1:'rgba(0,212,255,0.15)',2:'rgba(123,47,190,0.15)',3:'rgba(255,184,0,0.12)',4:'rgba(255,69,0,0.15)'};
+  const tierBorders={1:'rgba(0,212,255,0.3)',2:'rgba(123,47,190,0.35)',3:'rgba(255,184,0,0.35)',4:'rgba(255,69,0,0.4)'};
+  const tierLabels={1:'BASIC',2:'ADVANCED',3:'ELITE',4:'GODLIKE'};
+  [1,2,3,4].forEach(tier=>{
+    const nodes=RESEARCH.filter(r=>r.tier===tier);
+    if(!nodes.length) return;
+    const hdr=document.createElement('div');
+    hdr.style.cssText=`padding:10px 0 5px;font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:2px;color:var(--text-dim);`;
+    hdr.textContent='── TIER '+tier+' · '+tierLabels[tier]+' ──';
+    el.appendChild(hdr);
+    nodes.forEach(r=>{
+      const done=S.researched.has(r.id);
+      const reqMet=r.req.every(x=>S.researched.has(x));
+      const avail=!done&&reqMet&&canAfford(r.cost);
+      const locked=!done&&!reqMet;
+      const costStr=Object.entries(r.cost).map(([res,v])=>`💎 ${fmt(v)}`).join(', ');
+      const div=document.createElement('div');
+      div.className=`research-node ${done?'researched':avail?'available':''}`;
+      div.style.cssText=done?`background:rgba(74,222,128,0.06);border-color:rgba(74,222,128,0.3);`:
+        avail?`background:${tierColors[tier]};border-color:${tierBorders[tier]};`:
+        locked?'opacity:0.5;':'';
+      div.onclick=()=>doResearch(r.id);
+      const reqNames=r.req.map(rid=>{ const rr=RESEARCH.find(x=>x.id===rid); return rr?rr.name:'?'; });
+      div.innerHTML=`<div class="rn-icon">${r.icon}</div>
+        <div class="rn-info">
+          <div class="rn-name">${r.name}</div>
+          <div class="rn-desc">${r.desc}</div>
+          ${!done?`<div class="rn-cost">${costStr}</div>`:''}
+          ${locked?`<div style="font-size:9px;color:var(--text-dim);margin-top:2px">🔒 Braucht: ${reqNames.join(', ')}</div>`:''}
+        </div>
+        <div class="rn-status">${done?'✅':avail?'🔬':locked?'🔒':'💎'}</div>`;
+      el.appendChild(div);
+    });
   });
 }
 
